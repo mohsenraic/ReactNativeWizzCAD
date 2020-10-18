@@ -16,10 +16,10 @@ export class ListItem extends React.Component<ItemProps, ItemState> {
     super(props);
   }
   render() {
-
     return (
       <View style={styles.item}>
         <Text style={styles.title}>{this.props.data.name}</Text>
+        <Text style={styles.description}>Model du formulaire : {this.props.data.forms[0].model.name}</Text>
       </View>
     );
   }
@@ -40,5 +40,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
+  },
+
+  description: {
+    fontSize: 13,
   },
 });

@@ -4,7 +4,6 @@ import { API_ENDPOINT } from '../utils/Constants';
 
 const request = async function (options: any) {
 
-
   const client = axios.create({
     baseURL: API_ENDPOINT
   });

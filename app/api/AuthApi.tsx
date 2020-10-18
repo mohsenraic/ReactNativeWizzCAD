@@ -1,5 +1,10 @@
 import request from './ApiCentral'
 
+/**
+ * Permet de recuperer le token d'un utilistateur
+ * @param username 
+ * @param password 
+ */
 function auth(username: any, password: any) {
   const params = new URLSearchParams();
   params.append('login', username);

@@ -14,19 +14,12 @@ interface LoginProps {
 
 export class Login extends React.Component<LoginProps, LoginState> {
 
-
-
   constructor(props: any) {
     super(props);
     this.state = {
       username: DEMO_USER,
       password: DEMO_PASS
     }
-  }
-
-  componentDidMount() {
-
-
   }
 
   login() {

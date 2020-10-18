@@ -22,6 +22,7 @@ export class Details extends React.Component<DetailsProps, DetailsState> {
   }
 
   componentDidMount() {
+    //recuperation des données 
     DetailsApi.getContent().then((res) => {
       this.setState({ listData: res })
     })
@@ -32,9 +33,6 @@ export class Details extends React.Component<DetailsProps, DetailsState> {
   }
 
   render() {
-
-
-
 
     return (
       <SafeAreaView style={styles.container}>
@@ -53,15 +51,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: StatusBar.currentHeight || 0,
-  },
-  item: {
-    backgroundColor: '#faf7a7',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 25
-  },
-  title: {
-    fontSize: 32,
-  },
+  }
 });
