@@ -1,13 +1,16 @@
 /**
  * ============================================================================
- *  CONFIGURATION DU REEL
+ *  REEL CONFIGURATION — ENGLISH (Ushguli)
  * ============================================================================
- *  C'est le SEUL fichier à modifier pour réutiliser le template sur un autre
- *  lieu : nom, pays, coordonnées, textes, timings (en secondes), couleurs,
- *  sous-titres, caméra de la carte, profil d'altitude, tours…
+ *  This is the ONLY file you need to edit to reuse the template for another
+ *  place: name, country, coordinates, on-screen texts, subtitle segments,
+ *  timings (seconds), colors, map camera, altitude profile, towers…
  *
- *  Tous les temps sont exprimés en SECONDES depuis le début de la vidéo
- *  (sauf mention contraire « relatif à la scène »).
+ *  All times are in SECONDS from the start of the video, unless a comment
+ *  says "relative to the scene".
+ *
+ *  A French preset lives in src/presets/ushguli.fr.ts (copy it over this file
+ *  to render the French version).
  * ============================================================================
  */
 
@@ -16,39 +19,39 @@
 // ---------------------------------------------------------------------------
 
 export type Camera = {
-  /** Longitude du centre de l'écran (degrés, Est positif) */
+  /** Longitude at screen center (degrees, East positive) */
   lon: number;
-  /** Latitude du centre de l'écran (degrés, Nord positif) */
+  /** Latitude at screen center (degrees, North positive) */
   lat: number;
-  /** Échelle d3 de la projection orthographique (rayon du globe en px) */
+  /** d3 orthographic scale (globe radius in px) */
   scale: number;
 };
 
 export type SubtitleSegment = {
-  /** Début du segment (s) */
+  /** Segment start (s) */
   start: number;
-  /** Fin du segment (s) */
+  /** Segment end (s) */
   end: number;
-  /** 2 à 4 mots. Les mots sont répartis dans [start, end] au prorata de leur longueur. */
+  /** 2 to 4 words. Words are spread across [start, end] proportionally to their length. */
   text: string;
   /**
-   * Optionnel : instants de début de chaque mot (s), pour un calage précis.
-   * Doit contenir autant de valeurs que de mots dans `text`.
+   * Optional: start time of each word (s) for word-accurate sync.
+   * Must contain exactly as many values as there are words in `text`.
    */
   wordStarts?: number[];
 };
 
 export type Tower = {
-  /** Position horizontale du pied de la tour (0 = gauche, 1 = droite) */
+  /** Horizontal position of the tower's base (0 = left, 1 = right) */
   x: number;
-  /** Hauteur en px */
+  /** Height in px */
   height: number;
-  /** Largeur à la base en px */
+  /** Base width in px */
   width: number;
 };
 
 // ---------------------------------------------------------------------------
-// Vidéo
+// Video
 // ---------------------------------------------------------------------------
 
 export const VIDEO = {
@@ -58,7 +61,7 @@ export const VIDEO = {
   durationInSeconds: 32,
 } as const;
 
-/** Zones de sécurité Instagram / YouTube (px) */
+/** Instagram / YouTube safe zones (px) */
 export const SAFE_ZONE = {
   top: 250,
   bottom: 400,
@@ -66,39 +69,39 @@ export const SAFE_ZONE = {
 } as const;
 
 export const DEBUG = {
-  /** Affiche les zones interdites en rouge (à désactiver pour le rendu final) */
+  /** Shows the forbidden UI zones in red (turn off for the final render) */
   showSafeZones: false,
 } as const;
 
 // ---------------------------------------------------------------------------
-// Lieu
+// Place
 // ---------------------------------------------------------------------------
 
 export const PLACE = {
   name: 'USHGULI',
-  country: 'Géorgie',
-  /** Code ISO 3166-1 numérique du pays (identifiant utilisé par world-atlas). Géorgie = 268 */
+  country: 'Georgia',
+  /** ISO 3166-1 numeric country code (the id used by world-atlas). Georgia = 268 */
   countryIsoNumeric: '268',
   lat: 42.92,
   lon: 43.01,
-  /** Texte affiché sous l'étiquette du pin */
+  /** Shown under the pin label */
   coordinatesLabel: '42.92° N · 43.01° E',
 } as const;
 
 // ---------------------------------------------------------------------------
-// Couleurs & typo
+// Colors, fonts, numbers
 // ---------------------------------------------------------------------------
 
 export const COLORS = {
   background: '#0B1426',
   backgroundLight: '#13213B',
   ocean: '#0D1A30',
-  land: '#26385A', // bleu ardoise
+  land: '#26385A', // slate blue
   landHighlight: '#36507E',
-  border: '#7FB0E6', // frontières lumineuses
+  border: '#7FB0E6', // glowing borders
   borderHighlight: '#BFE0FF',
   graticule: '#3A5A8C',
-  accent: '#F5B841', // or chaud
+  accent: '#F5B841', // warm gold
   accentSoft: '#FFD57E',
   text: '#F4F6FB',
   textMuted: '#9BAAC4',
@@ -111,13 +114,18 @@ export const COLORS = {
   snow: '#FFFFFF',
 } as const;
 
+/** Number formatting: thousands separator (2,000) */
+export const NUMBERS = {
+  thousandsSeparator: ',',
+} as const;
+
 export const FONTS = {
-  /** 'Montserrat' ou 'Inter' */
+  /** 'Montserrat' or 'Inter' */
   display: 'Montserrat' as 'Montserrat' | 'Inter',
   body: 'Inter' as 'Montserrat' | 'Inter',
 };
 
-/** Grain & vignette cinématographiques */
+/** Cinematic grain & vignette */
 export const FILM = {
   grainOpacity: 0.07,
   vignetteStrength: 0.75,
@@ -128,17 +136,17 @@ export const FILM = {
 // ---------------------------------------------------------------------------
 
 export const AUDIO = {
-  /** Fichier dans /public */
+  /** File inside /public */
   voiceover: 'voiceover.mp3',
-  /** Mettre à false pour prévisualiser sans le fichier audio */
+  /** Set to false to preview without the audio file */
   enabled: true,
   volume: 1,
-  /** Décalage de la voix off (s). Positif = la voix démarre plus tard. */
+  /** Voiceover offset (s). Positive = the voice starts later. */
   offset: 0,
 } as const;
 
 // ---------------------------------------------------------------------------
-// Timings des scènes (s)
+// Scene timings (s)
 // ---------------------------------------------------------------------------
 
 export const SCENES = {
@@ -151,73 +159,73 @@ export const SCENES = {
   cta: {start: 27, end: 32},
 } as const;
 
-/** Durée des fondus enchaînés entre scènes (s) */
+/** Crossfade duration between scenes (s) */
 export const CROSSFADE = 0.45;
 
 // ---------------------------------------------------------------------------
-// Scène 1 — Accroche
+// Scene 1 — Hook
 // ---------------------------------------------------------------------------
 
 export const HOOK = {
-  text: "Ce village n'existe sur aucune carte touristique",
-  /** Mots affichés en or (comparaison insensible à la casse) */
-  accentWords: ['aucune'],
-  /** Délai avant le premier mot (s, relatif à la scène) */
+  text: "This village doesn't exist on any tourist map",
+  /** Words shown in gold (case-insensitive) */
+  accentWords: ['any'],
+  /** Delay before the first word (s, relative to the scene) */
   firstWordDelay: 0.15,
-  /** Intervalle entre deux mots (s) */
+  /** Delay between two words (s) */
   wordInterval: 0.25,
-  /** Zoom lent : échelle de fin */
+  /** Slow push-in: final scale */
   zoomTo: 1.08,
 };
 
 // ---------------------------------------------------------------------------
-// Scènes 2 & 3 — Globe puis zoom carte (caméra continue)
+// Scenes 2 & 3 — Globe then map zoom (one continuous camera)
 // ---------------------------------------------------------------------------
 
 export const MAP = {
-  /** Centre vertical de la carte à l'écran (px) */
+  /** Vertical center of the map on screen (px) */
   centerY: 820,
   camera: {
-    /** Début de la rotation du globe */
+    /** Globe rotation start */
     globeStart: {lon: -45, lat: 12, scale: 360} as Camera,
-    /** Globe arrêté sur la région (Caucase) */
+    /** Globe stopped on the region (Caucasus) */
     globeEnd: {lon: 43.8, lat: 42.3, scale: 390} as Camera,
-    /** Vue pays */
+    /** Country view */
     country: {lon: 43.6, lat: 42.3, scale: 7200} as Camera,
-    /** Vue lieu (zoom final) */
+    /** Place view (final zoom) */
     place: {lon: PLACE.lon, lat: PLACE.lat, scale: 19000} as Camera,
-    /** Vue dézoomée du CTA : on part de `ctaFrom` pour arriver à `cta` */
+    /** Zoomed-out CTA view: moves from `ctaFrom` to `cta` */
     ctaFrom: {lon: PLACE.lon, lat: PLACE.lat, scale: 12000} as Camera,
     cta: {lon: 43.4, lat: 42.55, scale: 5200} as Camera,
   },
-  /** La rotation du globe s'arrête à cet instant (s) */
+  /** Globe rotation stops at (s) */
   globeStopAt: 6.4,
-  /** Zoom globe -> pays (s) */
+  /** Globe -> country zoom (s) */
   zoomToCountry: {start: 7.0, end: 9.4},
-  /** Zoom pays -> lieu (s) */
+  /** Country -> place zoom (s) */
   zoomToPlace: {start: 9.4, end: 11.0},
-  /** Chute du pin (s) */
+  /** Pin drop (s) */
   pinDropAt: 10.5,
-  /** Apparition de l'étiquette (s) */
+  /** Label slide-in (s) */
   labelAt: 11.1,
-  /** Étiquettes discrètes affichées sur le globe */
-  regionLabel: 'CAUCASE',
+  /** Subtle label shown on the globe */
+  regionLabel: 'CAUCASUS',
 };
 
 // ---------------------------------------------------------------------------
-// Scène 4 — Altitude
+// Scene 4 — Altitude
 // ---------------------------------------------------------------------------
 
 export const ALTITUDE = {
-  /** Valeur finale du compteur */
+  /** Final counter value */
   value: 2000,
   prefix: '',
   suffix: '+ m',
-  title: "Parmi les villages habités les plus hauts d'Europe",
-  accentWords: ['plus', 'hauts'],
+  title: "Among Europe's highest inhabited villages",
+  accentWords: ['highest'],
   /**
-   * Profil du relief : [x (0→1), altitude en m].
-   * Ici : vallée de l'Enguri → Ushguli → massif du Shkhara (5 193 m).
+   * Terrain profile: [x (0→1), altitude in m].
+   * Here: Enguri valley → Ushguli → Shkhara massif (5,193 m).
    */
   profile: [
     [0.0, 900],
@@ -234,15 +242,15 @@ export const ALTITUDE = {
     [0.92, 4700],
     [1.0, 3600],
   ] as [number, number][],
-  /** Altitude max de l'axe (m) */
+  /** Axis max (m) */
   maxAltitude: 5600,
-  /** Position du village sur le profil (x 0→1) et son altitude réelle */
-  village: {x: 0.48, altitude: 2100, label: 'USHGULI · 2 100 m'},
-  /** Sommet nommé (optionnel) */
-  peak: {x: 0.76, label: 'SHKHARA · 5 193 m'} as {x: number; label: string} | null,
-  /** Graduations de l'axe (m) */
+  /** Village position on the profile (x 0→1) and its real altitude */
+  village: {x: 0.48, altitude: 2100, label: 'USHGULI · 2,100 m'},
+  /** Named peak (optional, set to null to hide) */
+  peak: {x: 0.76, label: 'SHKHARA · 5,193 m'} as {x: number; label: string} | null,
+  /** Axis ticks (m) */
   ticks: [1000, 2000, 3000, 4000, 5000],
-  /** Timings relatifs à la scène (s) */
+  /** Timings relative to the scene (s) */
   drawStart: 0.25,
   drawEnd: 3.2,
   counterStart: 0.5,
@@ -250,15 +258,15 @@ export const ALTITUDE = {
 };
 
 // ---------------------------------------------------------------------------
-// Scène 5 — Tours
+// Scene 5 — Towers
 // ---------------------------------------------------------------------------
 
 export const TOWERS = {
-  title: 'Tours médiévales défensives',
-  accentWords: ['médiévales'],
-  /** Ligne de sol (px depuis le haut) */
+  title: 'Medieval defensive towers',
+  accentWords: ['medieval'],
+  /** Ground line (px from top) */
   groundY: 1110,
-  /** Délai avant la 1re tour, et intervalle entre tours (s) */
+  /** Delay before the first tower, and delay between towers (s) */
   firstDelay: 0.35,
   stagger: 0.42,
   towers: [
@@ -271,69 +279,99 @@ export const TOWERS = {
 };
 
 // ---------------------------------------------------------------------------
-// Scène 6 — Hiver
+// Scene 6 — Winter
 // ---------------------------------------------------------------------------
 
 export const WINTER = {
-  title: "Coupé du monde l'hiver",
-  accentWords: ['hiver'],
+  title: 'Cut off from the world in winter',
+  accentWords: ['winter'],
   snowflakes: 220,
-  /** Durée du refroidissement de l'image (s) */
+  /** Cool-down duration of the image (s) */
   coolDownDuration: 1.4,
-  /** Couleur de la teinte glacée */
+  /** Icy tint color */
   tint: '#7FB8F0',
   tintOpacity: 0.32,
 };
 
 // ---------------------------------------------------------------------------
-// Scène 7 — CTA
+// Scene 7 — CTA
 // ---------------------------------------------------------------------------
 
 export const CTA = {
-  question: 'Tu y serais allé ?',
-  buttonLabel: 'Abonne-toi',
-  buttonSub: '1 trésor caché / semaine',
-  /** Timings relatifs à la scène (s) */
+  question: 'Would you go?',
+  buttonLabel: 'Follow',
+  buttonSub: '1 hidden gem / week',
+  /** Timings relative to the scene (s) */
   questionAt: 0.3,
   buttonAt: 1.5,
-  /** Instant du « clic » sur le bouton */
+  /** Moment of the button "tap" */
   tapAt: 3.1,
 };
 
 // ---------------------------------------------------------------------------
-// Sous-titres karaoké (calés sur la voix off)
+// Karaoke subtitles (synced to the voiceover)
 // ---------------------------------------------------------------------------
 
 export const SUBTITLES = {
-  /** Position verticale du centre des sous-titres (bas du tiers central) */
+  /** Vertical center of the subtitles (lower part of the central third) */
   centerY: 1200,
   fontSize: 62,
-  /** Mots toujours en or même lorsqu'ils ne sont pas actifs (optionnel) */
-  alwaysAccent: ['2 000', 'Ushguli'],
+  /** Words always shown in gold, even when not active (optional) */
+  alwaysAccent: ['Ushguli', 'thousand'],
   /**
-   * Segments de 2 à 4 mots. Pas de sous-titres pendant l'accroche : le texte
-   * est déjà à l'écran. Recalez `start` / `end` sur votre voix off.
+   * Time ranges (s) where subtitles are hidden. By default the hook, because
+   * the same sentence is already animated big on screen. Use [] to show them.
+   */
+  hiddenRanges: [[0, 3]] as [number, number][],
+  /**
+   * Voiceover: "This village doesn't exist on any tourist map. Yet people have
+   * lived here for over a thousand years. Welcome to Ushguli, hidden in the
+   * Caucasus mountains of Georgia. Sitting above two thousand meters, it's one
+   * of the highest permanently inhabited villages in Europe. Its medieval
+   * stone towers protected families from invaders and from clan feuds. And in
+   * winter, snow can cut it off from the world for weeks. Would you go?
+   * Follow for one hidden gem every week."
+   *
+   * Segments of 2 to 4 words. Re-sync `start` / `end` to your actual voiceover.
    */
   segments: [
-    {start: 3.1, end: 4.3, text: 'Cap sur le'},
-    {start: 4.3, end: 5.6, text: 'Caucase, aux confins'},
-    {start: 5.6, end: 6.9, text: "de l'Europe."},
-    {start: 7.2, end: 8.6, text: 'Au cœur de'},
-    {start: 8.6, end: 10.1, text: 'la Svanétie, en Géorgie,'},
-    {start: 10.3, end: 11.4, text: 'se cache'},
-    {start: 11.4, end: 12.8, text: 'Ushguli.'},
-    {start: 13.2, end: 14.6, text: 'Perché à plus'},
-    {start: 14.6, end: 16.0, text: 'de 2 000 mètres,'},
-    {start: 16.0, end: 17.4, text: "c'est l'un des villages"},
-    {start: 17.4, end: 18.8, text: "les plus hauts d'Europe."},
-    {start: 19.2, end: 20.6, text: 'Ses tours de pierre'},
-    {start: 20.6, end: 22.0, text: 'le protégeaient'},
-    {start: 22.0, end: 23.8, text: 'des envahisseurs.'},
-    {start: 24.1, end: 25.4, text: "L'hiver, la neige"},
-    {start: 25.4, end: 26.9, text: 'le coupe du monde.'},
-    {start: 27.2, end: 28.6, text: 'Tu y serais allé ?'},
-    {start: 28.8, end: 30.2, text: 'Abonne-toi pour'},
-    {start: 30.2, end: 31.0, text: 'un trésor caché'},
-    {start: 31.0, end: 31.9, text: 'par semaine.'},
+    // 0–3 s · Hook
+    {start: 0.15, end: 0.9, text: 'This village'},
+    {start: 0.9, end: 1.6, text: "doesn't exist"},
+    {start: 1.6, end: 2.15, text: 'on any'},
+    {start: 2.15, end: 2.9, text: 'tourist map.'},
+    // 3–7 s · Globe
+    {start: 3.05, end: 3.9, text: 'Yet people'},
+    {start: 3.9, end: 4.9, text: 'have lived here'},
+    {start: 4.9, end: 5.5, text: 'for over'},
+    {start: 5.5, end: 6.85, text: 'a thousand years.'},
+    // 7–13 s · Zoom
+    {start: 7.05, end: 8.4, text: 'Welcome to Ushguli,'},
+    {start: 8.4, end: 9.1, text: 'hidden in'},
+    {start: 9.1, end: 10.6, text: 'the Caucasus mountains'},
+    {start: 10.6, end: 11.6, text: 'of Georgia.'},
+    // 13–19 s · Altitude
+    {start: 13.0, end: 13.8, text: 'Sitting above'},
+    {start: 13.8, end: 15.0, text: 'two thousand meters,'},
+    {start: 15.0, end: 15.7, text: "it's one of"},
+    {start: 15.7, end: 17.0, text: 'the highest permanently'},
+    {start: 17.0, end: 18.1, text: 'inhabited villages'},
+    {start: 18.1, end: 18.9, text: 'in Europe.'},
+    // 19–24 s · Towers
+    {start: 19.05, end: 19.9, text: 'Its medieval'},
+    {start: 19.9, end: 20.8, text: 'stone towers'},
+    {start: 20.8, end: 21.9, text: 'protected families'},
+    {start: 21.9, end: 22.8, text: 'from invaders'},
+    {start: 22.8, end: 23.9, text: 'and from clan feuds.'},
+    // 24–27 s · Winter
+    {start: 24.0, end: 24.7, text: 'And in winter,'},
+    {start: 24.7, end: 25.5, text: 'snow can cut it'},
+    {start: 25.5, end: 26.25, text: 'off from the world'},
+    {start: 26.25, end: 26.95, text: 'for weeks.'},
+    // 27–32 s · CTA
+    {start: 27.2, end: 28.3, text: 'Would you go?'},
+    {start: 28.6, end: 29.6, text: 'Follow for'},
+    {start: 29.6, end: 30.6, text: 'one hidden gem'},
+    {start: 30.6, end: 31.7, text: 'every week.'},
   ] as SubtitleSegment[],
 };

@@ -23,8 +23,9 @@ const wordTimings = (seg: SubtitleSegment, words: string[]) => {
 export const Subtitles: React.FC = () => {
   const frame = useCurrentFrame();
   const time = frame / VIDEO.fps;
+  const hidden = SUBTITLES.hiddenRanges.some(([a, b]) => time >= a && time < b);
   const seg = SUBTITLES.segments.find((s) => time >= s.start && time < s.end);
-  if (!seg) return null;
+  if (!seg || hidden) return null;
 
   const words = splitWords(seg.text);
   const starts = wordTimings(seg, words);
@@ -59,7 +60,7 @@ export const Subtitles: React.FC = () => {
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'center',
-            columnGap: fs * 0.38,
+            columnGap: fs * 0.4,
             rowGap: 4,
             padding: '14px 30px',
             borderRadius: 26,
@@ -75,7 +76,7 @@ export const Subtitles: React.FC = () => {
           {words.map((w, i) => {
             const isActive = i === active;
             const pop = springAt(time, starts[i], POP_SPRING);
-            const bump = isActive ? interpolate(pop, [0, 0.5, 1], [1, 1.1, 1.04]) : 1;
+            const bump = isActive ? interpolate(pop, [0, 0.5, 1], [1, 1.06, 1.03]) : 1;
             const future = i > active;
             const gold = isActive || isAccent(w, SUBTITLES.alwaysAccent);
             return (

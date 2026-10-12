@@ -5,7 +5,7 @@ import {ALTITUDE, COLORS, SAFE_ZONE, VIDEO} from '../config';
 import {AnimatedWords} from '../components/AnimatedWords';
 import {Background} from '../components/Background';
 import {bodyFont, displayFont} from '../lib/fonts';
-import {formatNumberFr} from '../lib/text';
+import {formatNumber} from '../lib/text';
 import {POP_SPRING, progress, springAt, useSceneTime} from '../lib/time';
 
 const CHART = {left: 150, right: VIDEO.width - 60, top: 720, bottom: 1080};
@@ -99,7 +99,7 @@ export const AltitudeScene: React.FC = () => {
       >
         <span style={{fontSize: 190}}>
           {ALTITUDE.prefix}
-          {formatNumberFr(counter * ALTITUDE.value)}
+          {formatNumber(counter * ALTITUDE.value)}
         </span>
         <span style={{fontSize: 96, marginLeft: 12, letterSpacing: -1}}>{ALTITUDE.suffix}</span>
       </div>
@@ -162,7 +162,7 @@ export const AltitudeScene: React.FC = () => {
                 fontSize={22}
                 fill={gold ? COLORS.accent : COLORS.textMuted}
               >
-                {formatNumberFr(v)} m
+                {formatNumber(v)} m
               </text>
             </g>
           );

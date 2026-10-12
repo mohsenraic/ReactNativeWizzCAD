@@ -1,5 +1,10 @@
 # Reel « trésor caché » : template Remotion
 
+> **English:** `src/config.ts` is now the **English** version ("This village doesn't exist on any tourist map", subtitles from the English voiceover, numbers as `2,000`).
+> The French version is kept in `src/presets/ushguli.fr.ts`: copy it over `src/config.ts` to render it.
+> Install: `cd remotion-reel && npm install`, put your voiceover in `public/voiceover.mp3`, then `npm run dev` (Studio) or `npm run render` (→ `out/reel.mp4`).
+> Subtitles: edit `SUBTITLES.segments` (`{start, end, text}`, 2–4 words each, optional `wordStarts` for word-level sync). `SUBTITLES.hiddenRanges` hides them during the hook by default.
+
 Vidéo verticale **1080×1920 · 30 fps · 32 s** (Instagram Reel / YouTube Short).
 La carte est dessinée en SVG avec **d3-geo + world-atlas**, sans tuiles externes. Les sous-titres karaoké sont synchronisés sur une voix off.
 

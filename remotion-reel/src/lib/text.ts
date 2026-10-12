@@ -1,3 +1,5 @@
+import {NUMBERS} from '../config';
+
 const NBSP = ' ';
 
 /**
@@ -35,8 +37,8 @@ export const isAccent = (word: string, accents: readonly string[]) => {
   });
 };
 
-/** 2000 -> « 2 000 » (espace insécable) */
-export const formatNumberFr = (n: number) =>
+/** 2000 -> « 2,000 » / « 2 000 » selon NUMBERS.thousandsSeparator */
+export const formatNumber = (n: number) =>
   Math.round(n)
     .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, NBSP);
+    .replace(/\B(?=(\d{3})+(?!\d))/g, NUMBERS.thousandsSeparator);
