@@ -1,12 +1,21 @@
 import React from 'react';
 import {AbsoluteFill, interpolate} from 'remotion';
-import {COLORS, SAFE_ZONE, SCENES, TOWERS, VIDEO, WINTER} from '../config';
+import {COLORS, PHOTOS, SAFE_ZONE, SCENES, TOWERS, VIDEO, WINTER} from '../config';
 import {AnimatedWords} from '../components/AnimatedWords';
 import {Landscape} from '../components/Landscape';
+import {PhotoPanel} from '../components/PhotoPanel';
 import {Snow} from '../components/Snow';
 import {progress, useSceneTime} from '../lib/time';
 
-/** Scènes 5 & 6 — Tours médiévales puis hiver (même décor, continuité visuelle) */
+const PHOTO_FADE = 0.6;
+
+/**
+ * Scènes 5 & 6 — Tours puis hiver.
+ * Les tours illustrées s'élèvent, puis laissent place à la vraie photo du
+ * village ; l'hiver refroidit la photo de la vallée sous la neige.
+ * Sans photos (PHOTOS.towers / PHOTOS.winter = null), le décor illustré
+ * est conservé et passe lui-même à l'hiver.
+ */
 export const VillageScene: React.FC = () => {
   const {t, abs} = useSceneTime();
   const winterStart = SCENES.winter.start;
@@ -19,14 +28,48 @@ export const VillageScene: React.FC = () => {
   });
   const towersTitleOut = 1 - progress(abs, winterStart - 0.45, winterStart - 0.05);
 
+  const towersPhoto = PHOTOS.towers;
+  const winterPhoto = PHOTOS.winter;
+  const towersPhotoIn = towersPhoto ? progress(abs, towersPhoto.at, towersPhoto.at + PHOTO_FADE) : 0;
+  const winterPhotoIn = winterPhoto ? progress(abs, winterStart - 0.35, winterStart - 0.35 + PHOTO_FADE) : 0;
+  // Le décor illustré n'est plus visible une fois recouvert par une photo
+  const landscapeVisible = Math.max(towersPhotoIn, winterPhotoIn) < 1;
+
   return (
     <AbsoluteFill>
-      <AbsoluteFill style={{transform: `scale(${push})`, transformOrigin: `50% ${(TOWERS.groundY / VIDEO.height) * 100}%`}}>
-        <Landscape time={t} winter={winter} />
-      </AbsoluteFill>
+      {landscapeVisible ? (
+        <AbsoluteFill style={{transform: `scale(${push})`, transformOrigin: `50% ${(TOWERS.groundY / VIDEO.height) * 100}%`}}>
+          <Landscape time={t} winter={winterPhoto ? 0 : winter} />
+        </AbsoluteFill>
+      ) : null}
 
-      {/* Refroidissement : teinte glacée + givre sur les bords */}
-      <AbsoluteFill style={{background: WINTER.tint, mixBlendMode: 'color', opacity: winter * WINTER.tintOpacity}} />
+      {towersPhoto && towersPhotoIn > 0 && winterPhotoIn < 1 ? (
+        <AbsoluteFill style={{opacity: towersPhotoIn}}>
+          <PhotoPanel
+            src={towersPhoto.src}
+            kenBurns={towersPhoto.kenBurns}
+            progress={progress(abs, towersPhoto.at, winterPhoto ? winterStart : SCENES.winter.end, (x) => x)}
+            winter={winterPhoto ? 0 : winter}
+          />
+        </AbsoluteFill>
+      ) : null}
+
+      {winterPhoto && winterPhotoIn > 0 ? (
+        <AbsoluteFill style={{opacity: winterPhotoIn}}>
+          <PhotoPanel
+            src={winterPhoto.src}
+            kenBurns={winterPhoto.kenBurns}
+            progress={progress(abs, winterStart - 0.35, SCENES.winter.end + 0.3, (x) => x)}
+            winter={winter}
+          />
+        </AbsoluteFill>
+      ) : null}
+
+      {/* Refroidissement global du décor illustré (les photos ont leur propre étalonnage) */}
+      {!towersPhoto && !winterPhoto ? (
+        <AbsoluteFill style={{background: WINTER.tint, mixBlendMode: 'color', opacity: winter * WINTER.tintOpacity}} />
+      ) : null}
+      {/* Givre sur les bords */}
       <AbsoluteFill
         style={{
           background: `radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,255,255,0) 55%, ${COLORS.ice} 130%)`,

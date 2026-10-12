@@ -50,6 +50,23 @@ export type Tower = {
   width: number;
 };
 
+/**
+ * Slow "Ken Burns" move on a photo. Scale goes from `fromScale` to `toScale`
+ * around a focus point (x, y in % of the image) that moves from `from` to `to`.
+ */
+export type KenBurns = {
+  fromScale: number;
+  toScale: number;
+  from: {x: number; y: number};
+  to: {x: number; y: number};
+};
+
+export type Photo = {
+  /** File inside /public */
+  src: string;
+  kenBurns: KenBurns;
+};
+
 // ---------------------------------------------------------------------------
 // Video
 // ---------------------------------------------------------------------------
@@ -291,6 +308,38 @@ export const WINTER = {
   /** Icy tint color */
   tint: '#7FB8F0',
   tintOpacity: 0.32,
+};
+
+// ---------------------------------------------------------------------------
+// Real photos (files in public/photos). Set any entry to null to fall back to
+// the illustrated version of that moment.
+// Landscape photos are shown as a sharp cinematic band over a blurred copy,
+// so even small images stay crisp in the vertical frame.
+// ---------------------------------------------------------------------------
+
+export const PHOTOS = {
+  /** Photo card popping out of the pin at the end of the zoom (scene 3) */
+  pinCard: {
+    src: 'photos/ushguli-tower-closeup.webp',
+    at: 11.7,
+    kenBurns: {fromScale: 1.0, toScale: 1.12, from: {x: 60, y: 35}, to: {x: 60, y: 30}},
+  } as (Photo & {at: number}) | null,
+  /** Background of the altitude scene (scene 4), behind the terrain profile */
+  altitude: {
+    src: 'photos/ushguli-shkhara.webp',
+    kenBurns: {fromScale: 1.0, toScale: 1.14, from: {x: 47, y: 30}, to: {x: 47, y: 25}},
+  } as Photo | null,
+  /** Real towers revealed after the illustrated towers have risen (scene 5) */
+  towers: {
+    src: 'photos/ushguli-towers.webp',
+    at: 21.5,
+    kenBurns: {fromScale: 1.08, toScale: 1.2, from: {x: 30, y: 50}, to: {x: 70, y: 45}},
+  } as (Photo & {at: number}) | null,
+  /** Winter scene (scene 6): the photo is cooled down to icy blue + snow */
+  winter: {
+    src: 'photos/ushguli-valley.webp',
+    kenBurns: {fromScale: 1.05, toScale: 1.16, from: {x: 55, y: 45}, to: {x: 45, y: 40}},
+  } as Photo | null,
 };
 
 // ---------------------------------------------------------------------------

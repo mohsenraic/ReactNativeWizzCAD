@@ -1,13 +1,14 @@
 import {geoDistance} from 'd3-geo';
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate} from 'remotion';
-import {Camera, COLORS, MAP, PLACE, SCENES, VIDEO} from '../config';
+import {Camera, COLORS, MAP, PHOTOS, PLACE, SCENES, VIDEO} from '../config';
 import {Background} from '../components/Background';
+import {KenBurnsImage} from '../components/PhotoPanel';
 import {Pin} from '../components/Pin';
 import {WorldMap} from '../components/WorldMap';
 import {bodyFont} from '../lib/fonts';
 import {lerpCamera} from '../lib/geo';
-import {progress, useSceneTime} from '../lib/time';
+import {POP_SPRING, progress, springAt, useSceneTime} from '../lib/time';
 
 /** Caméra continue : rotation du globe -> arrêt sur la région -> zoom pays -> zoom lieu */
 const cameraAt = (abs: number): Camera => {
@@ -102,6 +103,52 @@ export const MapJourneyScene: React.FC = () => {
           }}
         </WorldMap>
       </AbsoluteFill>
+      <PinPhotoCard time={abs} />
+    </AbsoluteFill>
+  );
+};
+
+const CARD = {width: 580, height: 386, gap: 140};
+
+/** Vraie photo du lieu qui jaillit du pin */
+const PinPhotoCard: React.FC<{time: number}> = ({time}) => {
+  const photo = PHOTOS.pinCard;
+  if (!photo || time < photo.at) return null;
+  const p = springAt(time, photo.at, POP_SPRING);
+  const bottom = MAP.centerY - CARD.gap;
+  const line = progress(time, photo.at + 0.15, photo.at + 0.6);
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none'}}>
+      {/* Fil doré entre la carte et le pin */}
+      <div
+        style={{
+          position: 'absolute',
+          left: VIDEO.width / 2 - 1,
+          top: bottom,
+          width: 2,
+          height: (CARD.gap - 95) * line,
+          background: COLORS.accent,
+          opacity: 0.8,
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: (VIDEO.width - CARD.width) / 2,
+          top: bottom - CARD.height,
+          width: CARD.width,
+          height: CARD.height,
+          borderRadius: 22,
+          overflow: 'hidden',
+          border: `3px solid ${COLORS.accent}`,
+          boxShadow: '0 30px 60px rgba(0,0,0,0.55), 0 0 40px rgba(245,184,65,0.25)',
+          opacity: Math.min(1, p * 1.4),
+          transformOrigin: '50% 100%',
+          transform: `translateY(${interpolate(p, [0, 1], [CARD.gap, 0])}px) scale(${interpolate(p, [0, 1], [0.15, 1])}) rotate(${interpolate(p, [0, 1], [-8, -2.5])}deg)`,
+        }}
+      >
+        <KenBurnsImage src={photo.src} kenBurns={photo.kenBurns} progress={progress(time, photo.at, photo.at + 2.5, (x) => x)} />
+      </div>
     </AbsoluteFill>
   );
 };

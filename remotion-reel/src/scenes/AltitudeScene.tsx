@@ -1,9 +1,10 @@
 import {evolvePath, getLength, getPointAtLength} from '@remotion/paths';
 import React, {useMemo} from 'react';
 import {AbsoluteFill, Easing, interpolate} from 'remotion';
-import {ALTITUDE, COLORS, SAFE_ZONE, VIDEO} from '../config';
+import {ALTITUDE, COLORS, PHOTOS, SAFE_ZONE, SCENES, VIDEO} from '../config';
 import {AnimatedWords} from '../components/AnimatedWords';
 import {Background} from '../components/Background';
+import {PhotoPanel} from '../components/PhotoPanel';
 import {bodyFont, displayFont} from '../lib/fonts';
 import {formatNumber} from '../lib/text';
 import {POP_SPRING, progress, springAt, useSceneTime} from '../lib/time';
@@ -78,7 +79,18 @@ export const AltitudeScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Background stars time={t} glowY={900} />
+      {PHOTOS.altitude ? (
+        <PhotoPanel
+          src={PHOTOS.altitude.src}
+          kenBurns={PHOTOS.altitude.kenBurns}
+          progress={progress(t, -0.3, SCENES.altitude.end - SCENES.altitude.start + 0.3, (x) => x)}
+          centerY={(CHART.top + CHART.bottom) / 2 - 10}
+          height={700}
+          darken={0.15 + 0.3 * draw}
+        />
+      ) : (
+        <Background stars time={t} glowY={900} />
+      )}
 
       {/* Compteur */}
       <div

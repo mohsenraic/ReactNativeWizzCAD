@@ -3,6 +3,7 @@
 > **English:** `src/config.ts` is now the **English** version ("This village doesn't exist on any tourist map", subtitles from the English voiceover, numbers as `2,000`).
 > The French version is kept in `src/presets/ushguli.fr.ts`: copy it over `src/config.ts` to render it.
 > Install: `cd remotion-reel && npm install`, put your voiceover in `public/voiceover.mp3`, then `npm run dev` (Studio) or `npm run render` (→ `out/reel.mp4`).
+> Photos: real photos live in `public/photos/` and are wired in `PHOTOS` (config.ts): pin card (end of zoom), altitude background, real towers after the illustrated ones, and the winter scene. Each entry has a Ken Burns move; set it to `null` to use the illustrated version instead. Make sure you hold the rights to publish them.
 > Subtitles: edit `SUBTITLES.segments` (`{start, end, text}`, 2–4 words each, optional `wordStarts` for word-level sync). `SUBTITLES.hiddenRanges` hides them during the hook by default.
 
 Vidéo verticale **1080×1920 · 30 fps · 32 s** (Instagram Reel / YouTube Short).
@@ -40,6 +41,7 @@ npm i -D typescript @types/react @types/d3-geo @types/topojson-client \
 ```
 remotion-reel/
 ├── public/voiceover.mp3        ← votre voix off (non versionnée)
+├── public/photos/              ← vraies photos du lieu (PHOTOS dans config.ts)
 ├── remotion.config.ts          ← codec, qualité
 └── src/
     ├── config.ts               ← ★ TOUT le contenu : lieu, textes, timings, couleurs, sous-titres
@@ -57,6 +59,7 @@ remotion-reel/
     │   ├── Subtitles.tsx       ← sous-titres karaoké
     │   ├── AnimatedWords.tsx   ← texte mot par mot
     │   ├── Landscape.tsx       ← montagnes + tours de pierre + passage à l'hiver
+    │   ├── PhotoPanel.tsx      ← photo en bandeau net + fond flou, Ken Burns, étalonnage hiver
     │   ├── Snow.tsx            ← particules de neige
     │   ├── Background.tsx      ← fond nuit + étoiles
     │   ├── FilmOverlay.tsx     ← grain + vignette
