@@ -1,10 +1,11 @@
 import React from 'react';
 import {AbsoluteFill, interpolate} from 'remotion';
 import {DATA} from '../data';
-import {HEIGHT, MAP_CENTER_Y, WIDTH} from '../lib/constants';
+import {HEIGHT, WIDTH} from '../lib/constants';
 import {FONT, W_EXTRABOLD, W_SEMIBOLD} from '../lib/fonts';
 import {POP, progress, springAt} from '../lib/anim';
 import type {Timeline} from '../lib/timeline';
+import {placeOnScreen} from './Globe';
 import {FactIconSvg} from './Icons';
 
 const theme = DATA.theme;
@@ -59,21 +60,64 @@ export const HookTitle: React.FC<{time: number; tl: Timeline}> = ({time, tl}) =>
 };
 
 // ---------------------------------------------------------------------------
+// HookBackground — abstract animated lagoon colours: no photo before the reveal
+// ---------------------------------------------------------------------------
+export const HookBackground: React.FC<{time: number; tl: Timeline}> = ({time, tl}) => {
+  const out = 1 - progress(time, tl.hookEnd - 0.3, tl.hookEnd + 0.3);
+  if (out <= 0) return null;
+  const blobs = [
+    {c: theme.turquoise, x: 30, y: 35, r: 55, sx: 9, sy: 6, ph: 0},
+    {c: '#1E78BE', x: 70, y: 60, r: 60, sx: -7, sy: 8, ph: 1.7},
+    {c: theme.sand, x: 55, y: 80, r: 35, sx: 6, sy: -5, ph: 3.1},
+    {c: theme.turquoise, x: 80, y: 20, r: 40, sx: -8, sy: 5, ph: 4.4},
+  ];
+  return (
+    <AbsoluteFill style={{background: theme.navy, opacity: out, overflow: 'hidden'}}>
+      {blobs.map((b, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            left: `${b.x + Math.sin(time * 0.9 + b.ph) * b.sx}%`,
+            top: `${b.y + Math.cos(time * 0.7 + b.ph) * b.sy}%`,
+            width: `${b.r * 2}vw`,
+            height: `${b.r * 2}vw`,
+            marginLeft: `-${b.r}vw`,
+            marginTop: `-${b.r}vw`,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${b.c} 0%, transparent 65%)`,
+            opacity: i === 2 ? 0.45 : 0.75,
+            filter: 'blur(40px)',
+          }}
+        />
+      ))}
+      {/* light ripples, like sun on water */}
+      <AbsoluteFill
+        style={{
+          background: `repeating-radial-gradient(circle at 50% ${60 + Math.sin(time) * 4}%, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0) ${18 + time * 4}px, rgba(255,255,255,0.02) ${36 + time * 8}px)`,
+          mixBlendMode: 'screen',
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------
 // LocationPin — drops with a bounce on the place, pulse, then label
 // ---------------------------------------------------------------------------
 export const LocationPin: React.FC<{time: number; tl: Timeline}> = ({time, tl}) => {
-  if (time < tl.pinDrop - 0.05 || time > tl.pinOut + 0.4) return null;
+  if (time < tl.pinDrop - 0.05 || time > tl.revealEnd) return null;
   const p = springAt(time, tl.pinDrop, {damping: 9, stiffness: 120, mass: 0.7});
   const lift = -380 * Math.abs(1 - p);
-  const fadeOut = 1 - progress(time, tl.pinOut - 0.1, tl.pinOut + 0.3);
-  const label = springAt(time, tl.pinLand + 0.05, POP);
+  // The pin follows the map and vanishes as the iris opens
+  const fadeOut = 1 - progress(time, tl.revealAt - 0.1, tl.revealAt + 0.25);
+  const label = springAt(time, tl.pinLand + 0.05, POP) * (1 - progress(time, tl.pinLabelOut - 0.3, tl.pinLabelOut));
   const landed = time > tl.pinLand;
   const rings = [0, 1, 2].map((k) => {
     const ph = ((((time - tl.pinLand) / 1.3 + k / 3) % 1) + 1) % 1;
     return {r: 10 + ph * 140, o: landed ? (1 - ph) * 0.8 : 0};
   });
-  const x = WIDTH / 2;
-  const y = MAP_CENTER_Y;
+  const [x, y] = placeOnScreen(time, tl);
   return (
     <AbsoluteFill style={{opacity: fadeOut}}>
       <svg width={WIDTH} height={HEIGHT} style={{position: 'absolute'}}>
@@ -97,7 +141,8 @@ export const LocationPin: React.FC<{time: number; tl: Timeline}> = ({time, tl}) 
             position: 'absolute',
             left: 0,
             right: 0,
-            top: y + 40,
+            // above the pin, so that the map below stays readable
+            top: y - 230,
             display: 'flex',
             justifyContent: 'center',
             opacity: Math.min(1, label * 1.4),

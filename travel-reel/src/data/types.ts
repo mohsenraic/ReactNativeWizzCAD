@@ -29,12 +29,26 @@ export type PlaceData = {
   };
   tailSeconds: number;
   hook: {text: string; accentWords: string[]};
-  beats: {globe: Beat; pin: Beat; endCard: Beat};
+  beats: {
+    globe: Beat;
+    pin: Beat;
+    /** Optional: map detail (e.g. a neighbouring island) */
+    detail?: Beat;
+    /** Final zoom towards the place, just before the reveal */
+    zoomIn: Beat;
+    /** First photo revealed (iris from the pin) — ideally mid-video */
+    reveal: Beat;
+    endCard: Beat;
+  };
   globe: {
     from: Camera;
     country: Camera;
     zoomTo: Camera;
-    labels: {text: string; lon: number; lat: number}[];
+    /** Scale reached at the reveal (fast zoom on the place) */
+    revealScale: number;
+    labels: {text: string; lon: number; lat: number; phrase?: string}[];
+    /** Optional detail point highlighted on the map (island, town…) */
+    detail?: {label: string; lon: number; lat: number; camera: Camera};
   };
   pinLabel: string;
   /** Show the FACT cards on screen (the facts still drive the photo cuts) */
@@ -42,7 +56,10 @@ export type PlaceData = {
   facts: (Beat & {title: string; icon: FactIcon})[];
   endCard: {text: string};
   photos: {
+    /** First photo revealed (the most spectacular one) */
     hero?: string;
+    /** Photo behind the end card (defaults to hero) */
+    endCard?: string;
     hints: Record<string, {focus?: {x: number; y: number}}>;
     maxShotSeconds: number;
   };

@@ -3,12 +3,12 @@ import {AbsoluteFill, getStaticFiles, Html5Audio, interpolate, staticFile, useCu
 import {DATA} from './data';
 import type {ReelProps} from './data/types';
 import {Globe} from './components/Globe';
-import {Captions, EndCardText, FactCards, HookTitle, LocationPin} from './components/Overlays';
+import {Captions, EndCardText, FactCards, HookBackground, HookTitle, LocationPin} from './components/Overlays';
 import {PhotoScene} from './components/PhotoScene';
 import {PhotoTrack} from './components/PhotoTrack';
 import {FPS} from './lib/constants';
 import {progress} from './lib/anim';
-import {buildTimeline, heroPhoto, Timeline} from './lib/timeline';
+import {buildTimeline, endCardPhoto, heroPhoto, Timeline} from './lib/timeline';
 
 const IMAGE_RE = /\.(jpe?g|png|webp|avif)$/i;
 
@@ -44,36 +44,27 @@ export const Reel: React.FC<ReelProps> = ({audioDuration, words}) => {
     );
   }
 
-  const heroFocus = DATA.photos.hints[hero]?.focus ?? {x: 50, y: 50};
-  const showGlobe = time >= tl.globeStart - 0.3 && time <= tl.diveEnd + 0.05;
+  const endPhoto = endCardPhoto(DATA, photos);
+  const endFocus = DATA.photos.hints[endPhoto]?.focus ?? {x: 50, y: 50};
+  const showGlobe = time >= tl.globeStart - 0.3 && time <= tl.revealEnd + 0.05;
   const endIn = progress(time, tl.endCardStart - 0.15, tl.endCardStart + 0.35);
 
   return (
     <AbsoluteFill style={{backgroundColor: DATA.theme.navy}}>
-      {/* 1 · Hook: the most spectacular photo */}
-      {time < tl.globeStart + 0.4 ? (
-        <PhotoScene
-          src={hero}
-          focus={heroFocus}
-          motion="zoomIn"
-          progress={time / (tl.globeStart + 0.4)}
-          exitP={progress(time, tl.globeStart - 0.3, tl.globeStart + 0.3, (x) => x)}
-          exitType="zoomThrough"
-          darken={0.15}
-        />
-      ) : null}
+      {/* 1 · Hook: abstract lagoon colours, no photo (surprise kept for later) */}
+      <HookBackground time={time} tl={tl} />
 
-      {/* 2 · Globe -> zoom -> dive */}
+      {/* 3 · Photos, revealed mid-video, under the map's iris */}
+      {time >= tl.revealAt - 0.05 ? <PhotoTrack shots={tl.shots} time={time} /> : null}
+
+      {/* 2 · Globe -> coast -> detail -> zoom -> iris reveal */}
       {showGlobe ? <Globe time={time} tl={tl} /> : null}
 
-      {/* 3 · Photos synced to the facts */}
-      {time >= tl.diveStart ? <PhotoTrack shots={tl.shots} time={time} /> : null}
-
-      {/* 4 · End card on the hero photo */}
+      {/* 4 · End card */}
       {endIn > 0 ? (
         <PhotoScene
-          src={hero}
-          focus={heroFocus}
+          src={endPhoto}
+          focus={endFocus}
           motion="zoomOut"
           progress={interpolate(time, [tl.endCardStart, tl.total], [0, 1], {extrapolateRight: 'clamp'})}
           enterP={endIn}

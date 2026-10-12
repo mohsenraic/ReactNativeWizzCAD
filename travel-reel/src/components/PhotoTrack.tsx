@@ -12,10 +12,11 @@ export const PhotoTrack: React.FC<{shots: Shot[]; time: number}> = ({shots, time
     {shots.map((s, i) => {
       const isFirst = i === 0;
       const isLast = i === shots.length - 1;
-      const from = s.start - (isFirst ? 0.25 : T / 2);
+      // the first shot (the reveal) is already fully there under the map's iris
+      const from = s.start - (isFirst ? 0.05 : T / 2);
       const to = s.end + (isLast ? 0.4 : T / 2);
       if (time < from || time > to) return null;
-      const enterP = isFirst ? (time - from) / 0.5 : (time - from) / T;
+      const enterP = isFirst ? 1 : (time - from) / T;
       const exitP = isLast ? 0 : (time - (s.end - T / 2)) / T;
       return (
         <Sequence key={i} from={Math.floor(from * FPS)} durationInFrames={Math.ceil((to - from) * FPS)} layout="none">

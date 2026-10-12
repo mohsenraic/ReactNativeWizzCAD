@@ -29,6 +29,17 @@ travel-reel/
     └── components/                   ← PhotoScene, PhotoTrack, Globe, Overlays (Hook, Pin, FactCards, Captions, EndCard), Icons
 ```
 
+## Structure « effet de surprise »
+
+Aucune photo n'apparaît avant le milieu de la vidéo :
+1. **Accroche :** fond abstrait animé aux couleurs du lagon, avec le titre.
+2. **Globe :** il tourne vers le pays, l'épingle atterrit sur le nom du lieu.
+3. **Carte :** une carte détaillée de la côte (données 10m) suit la voix, avec les étiquettes de région et le point de détail (`globe.detail`, ici Corfu).
+4. **Révélation :** zoom accéléré, puis la première photo (`photos.hero`) s'ouvre en cercle depuis l'épingle, sur la phrase `beats.reveal`.
+5. **Fin :** les autres photos défilent, puis l'écran de fin s'affiche sur `photos.endCard`.
+
+Pour avancer ou reculer la révélation, changez `beats.reveal.phrase`.
+
 ## Comment ça se synchronise
 
 Aucun timing n'est écrit en dur. Chaque moment clé est **ancré sur une phrase de la voix off** dans `data/ksamil.ts`, par exemple `beats.pin.phrase = "but it's Ksamil"` ou `facts[i].phrase`. Ces phrases sont retrouvées dans `voiceover.words.json` :

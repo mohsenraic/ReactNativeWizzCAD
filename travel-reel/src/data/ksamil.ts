@@ -58,6 +58,10 @@ export const ksamil: PlaceData = {
   beats: {
     globe: {phrase: 'Most people think'},
     pin: {phrase: "but it's Ksamil"},
+    detail: {phrase: 'right across from'},
+    zoomIn: {phrase: 'You can swim'},
+    // The first photo appears on "tiny islands" (~ middle of the video)
+    reveal: {phrase: 'tiny islands', offset: -0.1},
     endCard: {phrase: 'Would you go here'},
   },
 
@@ -68,12 +72,15 @@ export const ksamil: PlaceData = {
     country: {lon: 20.1, lat: 41.2, scale: 430},
     /** End of the zoom (southern coast) */
     zoomTo: {lon: 20.0, lat: 39.77, scale: 13000},
-    /** Region labels shown during the zoom (optional) */
+    /** Scale reached at the reveal */
+    revealScale: 400000,
+    /** Map labels. With `phrase`, the label appears when that phrase is spoken. */
     labels: [
       {text: 'ALBANIA', lon: 20.0, lat: 41.1},
-      {text: 'CORFU', lon: 19.85, lat: 39.62},
-      {text: 'IONIAN SEA', lon: 19.35, lat: 39.25},
+      {text: 'IONIAN SEA', lon: 19.3, lat: 39.6, phrase: 'Ionian Sea'},
     ],
+    /** Highlighted on "right across from the Greek island of Corfu" */
+    detail: {label: 'CORFU 🇬🇷', lon: 19.88, lat: 39.6, camera: {lon: 19.88, lat: 39.65, scale: 40000}},
   },
 
   pinLabel: 'KSAMIL, ALBANIA',
@@ -94,12 +101,14 @@ export const ksamil: PlaceData = {
 
   /**
    * Photos: every image in public/photos/ is used automatically (sorted by
-   * file name). The first one (or `hero`) opens and closes the video — put
-   * the most spectacular one first. `focus` = subject to keep centered when
+   * file name). No photo is shown before the reveal (surprise effect): the
+   * first one (or `hero`) is revealed mid-video — put the most spectacular
+   * one first. `focus` = subject to keep centered when
    * cropping to 9:16 (x, y in % of the image).
    */
   photos: {
     hero: '01-aerial-island.webp',
+    endCard: '02-aerial-islands.webp',
     hints: {
       '01-aerial-island.webp': {focus: {x: 50, y: 50}},
       '02-aerial-islands.webp': {focus: {x: 62, y: 48}},

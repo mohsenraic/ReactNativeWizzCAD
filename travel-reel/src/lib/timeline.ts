@@ -27,9 +27,17 @@ export type Timeline = {
   /** Pin drop start, and the instant it lands (on the place name) */
   pinDrop: number;
   pinLand: number;
-  diveStart: number;
-  diveEnd: number;
-  pinOut: number;
+  /** Pin label visible until… */
+  pinLabelOut: number;
+  /** Map label appearance times (same order as data.globe.labels) */
+  labelTimes: number[];
+  /** Map detail (e.g. Corfu), null if none */
+  detailAt: number | null;
+  /** Final zoom towards the place */
+  zoomInStart: number;
+  /** Iris reveal of the first photo */
+  revealAt: number;
+  revealEnd: number;
   facts: {start: number; end: number; title: string; icon: FactIcon; index: number}[];
   endCardStart: number;
   shots: Shot[];
@@ -156,6 +164,12 @@ export const buildTimeline = (
     pin.index >= 0 ? words[Math.min(words.length - 1, pin.index + pinWords - 1)].start : pin.time + 0.5;
   const pinDrop = pinLand - 0.45;
 
+  const detail = data.beats.detail ? resolveBeat(words, data.beats.detail, pinLand, pinLand + 3) : null;
+  const zoomIn = resolveBeat(words, data.beats.zoomIn, detail?.time ?? pinLand, pinLand + 5);
+  const reveal = resolveBeat(words, data.beats.reveal, zoomIn.time, zoomIn.time + 1.5);
+  const revealAt = Math.max(zoomIn.time + 0.6, reveal.time);
+  const revealEnd = revealAt + 0.7;
+
   const factBeats: {time: number; f: PlaceData['facts'][number]}[] = [];
   let after = pinLand;
   data.facts.forEach((f, i) => {
@@ -170,10 +184,20 @@ export const buildTimeline = (
   const hookEnd = globeStart;
   const zoomEnd = Math.max(globeStart + 1.2, pinDrop - 0.1);
   const zoomStart = globeStart + (zoomEnd - globeStart) * 0.42;
-  const firstFact = factBeats.length ? factBeats[0].time : endCardStart;
-  const diveStart = Math.max(pinLand + 0.5, Math.min(pinLand + 1.0, firstFact - 0.75));
-  const diveEnd = diveStart + 0.6;
-  const pinOut = Math.min(firstFact - 0.05, diveEnd + 0.9);
+  const detailAt = detail ? detail.time : null;
+  const zoomInStart = zoomIn.time;
+
+  // Map labels: on their phrase if given, otherwise at the end of the zoom
+  const labelTimes = data.globe.labels.map((l) =>
+    l.phrase ? resolveBeat(words, {phrase: l.phrase}, pinLand, zoomEnd).time : zoomEnd - 0.6,
+  );
+  // The pin label leaves room for the map labels that follow it
+  const nextMapEvent = Math.min(
+    ...labelTimes.filter((t) => t > pinLand + 0.8),
+    detailAt ?? Infinity,
+    zoomInStart,
+  );
+  const pinLabelOut = Math.max(pinLand + 1.5, nextMapEvent - 0.3);
 
   const facts = factBeats.map((b, i) => ({
     start: b.time,
@@ -190,9 +214,10 @@ export const buildTimeline = (
   // The hero opens and closes the video; it also joins the rotation (after
   // the others) so that few photos still give variety
   const pool = others.length ? [...others, hero] : photos;
+  const endPhoto = data.photos.endCard && photos.includes(data.photos.endCard) ? data.photos.endCard : hero;
 
-  // Segments: from the dive to the end card, cut at each fact
-  const bounds = [diveStart + 0.2, ...facts.map((f) => f.start), endCardStart];
+  // Segments: from the reveal to the end card, cut at each fact spoken after it
+  const bounds = [revealAt, ...facts.map((f) => f.start).filter((t) => t > revealAt + 1), endCardStart];
   const segments: [number, number][] = [];
   for (let i = 0; i < bounds.length - 1; i++) {
     const [a, b] = [bounds[i], bounds[i + 1]];
@@ -210,9 +235,12 @@ export const buildTimeline = (
     for (let k = 0; k < n; k++) {
       const prev = shots[shots.length - 1];
       const isLastShot = segments[segments.length - 1][1] === b && k === n - 1;
-      let src = pool[photoCursor % pool.length];
-      // never the same photo twice in a row, and not the hero right before the end card
-      if ((prev && src === prev.src) || (isLastShot && src === hero && pool.length > 1)) {
+      const isReveal = shots.length === 0;
+      // The reveal is always the most spectacular photo
+      let src = isReveal ? hero : pool[photoCursor % pool.length];
+      if (isReveal) photoCursor--;
+      // never the same photo twice in a row, nor the end card photo right before it
+      if ((prev && src === prev.src) || (isLastShot && src === endPhoto && pool.length > 1)) {
         src = pool[++photoCursor % pool.length];
       }
       photoCursor++;
@@ -220,14 +248,15 @@ export const buildTimeline = (
       const base = data.photos.hints[src]?.focus ?? {x: 50, y: 50};
       // A reused photo gets a different crop
       const shift = uses === 1 ? 0 : uses % 2 === 0 ? 12 : -12;
-      let motion = MOTIONS[shots.length % MOTIONS.length];
+      let motion: Motion = isReveal ? 'zoomOut' : MOTIONS[shots.length % MOTIONS.length];
       if (prev && prev.motion === motion) motion = MOTIONS[(shots.length + 1) % MOTIONS.length];
       shots.push({
         src,
         start: a + ((b - a) * k) / n,
         end: a + ((b - a) * (k + 1)) / n,
         motion,
-        enter: shots.length === 0 ? 'zoomThrough' : TRANSITIONS[shots.length % TRANSITIONS.length],
+        // the reveal itself is the map's iris
+        enter: isReveal ? 'fade' : TRANSITIONS[shots.length % TRANSITIONS.length],
         exit: null,
         focus: {x: Math.min(85, Math.max(15, base.x + shift)), y: base.y},
       });
@@ -246,9 +275,12 @@ export const buildTimeline = (
     zoomEnd,
     pinDrop,
     pinLand,
-    diveStart,
-    diveEnd,
-    pinOut,
+    pinLabelOut,
+    labelTimes,
+    detailAt,
+    zoomInStart,
+    revealAt,
+    revealEnd,
     facts,
     endCardStart,
     shots,
@@ -260,3 +292,6 @@ export const heroPhoto = (data: PlaceData, photoFiles: string[]) => {
   const photos = [...photoFiles].sort();
   return data.photos.hero && photos.includes(data.photos.hero) ? data.photos.hero : photos[0];
 };
+
+export const endCardPhoto = (data: PlaceData, photoFiles: string[]) =>
+  data.photos.endCard && photoFiles.includes(data.photos.endCard) ? data.photos.endCard : heroPhoto(data, photoFiles);
