@@ -83,7 +83,7 @@ export const Reel: React.FC<ReelProps> = ({audioDuration, words}) => {
       ) : null}
 
       <LocationPin time={time} tl={tl} />
-      <FactCards time={time} tl={tl} />
+      {DATA.showFactCards ? <FactCards time={time} tl={tl} /> : null}
       <HookTitle time={time} tl={tl} />
       <EndCardText time={time} tl={tl} />
       <Captions time={time} tl={tl} />

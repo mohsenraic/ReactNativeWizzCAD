@@ -78,6 +78,9 @@ export const ksamil: PlaceData = {
 
   pinLabel: 'KSAMIL, ALBANIA',
 
+  /** false = no FACT cards on screen; the facts below still sync the photo cuts */
+  showFactCards: false,
+
   facts: [
     {phrase: 'It sits on', title: 'Ionian Sea, facing Corfu', icon: 'wave'},
     {phrase: 'You can swim', title: 'Swim to tiny islands', icon: 'swim'},

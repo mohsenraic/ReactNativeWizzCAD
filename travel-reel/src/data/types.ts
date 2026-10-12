@@ -37,6 +37,8 @@ export type PlaceData = {
     labels: {text: string; lon: number; lat: number}[];
   };
   pinLabel: string;
+  /** Show the FACT cards on screen (the facts still drive the photo cuts) */
+  showFactCards: boolean;
   facts: (Beat & {title: string; icon: FactIcon})[];
   endCard: {text: string};
   photos: {
