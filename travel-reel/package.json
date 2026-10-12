@@ -1,0 +1,31 @@
+{
+  "name": "travel-reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Template Remotion de Reels voyage (photos, globe d3-geo, voix off ElevenLabs, sous-titres synchronisés).",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render KsamilReel out/ksamil-reel.mp4",
+    "still": "remotion still KsamilReel out/cover.png --frame=30",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.535",
+    "@remotion/google-fonts": "4.0.535",
+    "@remotion/media-utils": "4.0.535",
+    "d3-geo": "3.1.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.535",
+    "topojson-client": "3.1.0",
+    "world-atlas": "2.0.2"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "3.1.0",
+    "@types/geojson": "7946.0.16",
+    "@types/react": "19.1.8",
+    "@types/topojson-client": "3.1.5",
+    "@types/topojson-specification": "1.0.5",
+    "typescript": "5.8.3"
+  }
+}

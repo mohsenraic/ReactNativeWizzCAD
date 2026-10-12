@@ -1,0 +1,395 @@
+{
+ "source": "ElevenLabs (eleven_multilingual_v2, voice Drew) + Scribe v1 alignment",
+ "words": [
+  {
+   "text": "Wait…",
+   "start": 0,
+   "end": 0.383
+  },
+  {
+   "text": "is",
+   "start": 0.453,
+   "end": 0.662
+  },
+  {
+   "text": "this",
+   "start": 0.731,
+   "end": 0.929
+  },
+  {
+   "text": "really",
+   "start": 1.08,
+   "end": 1.533
+  },
+  {
+   "text": "in",
+   "start": 1.649,
+   "end": 1.8
+  },
+  {
+   "text": "Europe?",
+   "start": 1.881,
+   "end": 2.218
+  },
+  {
+   "text": "Most",
+   "start": 2.252,
+   "end": 2.519
+  },
+  {
+   "text": "people",
+   "start": 2.566,
+   "end": 2.856
+  },
+  {
+   "text": "think",
+   "start": 2.902,
+   "end": 3.135
+  },
+  {
+   "text": "this",
+   "start": 3.216,
+   "end": 3.564
+  },
+  {
+   "text": "is",
+   "start": 3.657,
+   "end": 3.808
+  },
+  {
+   "text": "the",
+   "start": 3.866,
+   "end": 3.936
+  },
+  {
+   "text": "Maldives…",
+   "start": 4.005,
+   "end": 4.702
+  },
+  {
+   "text": "but",
+   "start": 5.294,
+   "end": 5.492
+  },
+  {
+   "text": "it's",
+   "start": 5.561,
+   "end": 5.747
+  },
+  {
+   "text": "Ksamil,",
+   "start": 5.805,
+   "end": 6.525
+  },
+  {
+   "text": "in",
+   "start": 6.56,
+   "end": 6.699
+  },
+  {
+   "text": "Albania.",
+   "start": 6.757,
+   "end": 7.419
+  },
+  {
+   "text": "It",
+   "start": 7.697,
+   "end": 7.883
+  },
+  {
+   "text": "sits",
+   "start": 7.941,
+   "end": 8.243
+  },
+  {
+   "text": "on",
+   "start": 8.313,
+   "end": 8.452
+  },
+  {
+   "text": "the",
+   "start": 8.487,
+   "end": 8.568
+  },
+  {
+   "text": "Ionian",
+   "start": 8.696,
+   "end": 9.276
+  },
+  {
+   "text": "Sea,",
+   "start": 9.369,
+   "end": 9.671
+  },
+  {
+   "text": "right",
+   "start": 9.741,
+   "end": 9.973
+  },
+  {
+   "text": "across",
+   "start": 9.996,
+   "end": 10.368
+  },
+  {
+   "text": "from",
+   "start": 10.403,
+   "end": 10.53
+  },
+  {
+   "text": "the",
+   "start": 10.565,
+   "end": 10.635
+  },
+  {
+   "text": "Greek",
+   "start": 10.681,
+   "end": 10.948
+  },
+  {
+   "text": "island",
+   "start": 11.018,
+   "end": 11.378
+  },
+  {
+   "text": "of",
+   "start": 11.424,
+   "end": 11.482
+  },
+  {
+   "text": "Corfu.",
+   "start": 11.552,
+   "end": 12.144
+  },
+  {
+   "text": "You",
+   "start": 12.353,
+   "end": 12.469
+  },
+  {
+   "text": "can",
+   "start": 12.516,
+   "end": 12.632
+  },
+  {
+   "text": "swim",
+   "start": 12.69,
+   "end": 13.038
+  },
+  {
+   "text": "or",
+   "start": 13.154,
+   "end": 13.317
+  },
+  {
+   "text": "kayak",
+   "start": 13.386,
+   "end": 13.804
+  },
+  {
+   "text": "to",
+   "start": 13.862,
+   "end": 13.92
+  },
+  {
+   "text": "tiny",
+   "start": 13.99,
+   "end": 14.327
+  },
+  {
+   "text": "islands",
+   "start": 14.408,
+   "end": 14.814
+  },
+  {
+   "text": "just",
+   "start": 14.896,
+   "end": 15.186
+  },
+  {
+   "text": "off",
+   "start": 15.244,
+   "end": 15.43
+  },
+  {
+   "text": "the",
+   "start": 15.476,
+   "end": 15.546
+  },
+  {
+   "text": "beach.",
+   "start": 15.593,
+   "end": 15.952
+  },
+  {
+   "text": "And",
+   "start": 16.161,
+   "end": 16.301
+  },
+  {
+   "text": "just",
+   "start": 16.359,
+   "end": 16.568
+  },
+  {
+   "text": "minutes",
+   "start": 16.649,
+   "end": 16.974
+  },
+  {
+   "text": "away,",
+   "start": 17.021,
+   "end": 17.473
+  },
+  {
+   "text": "the",
+   "start": 17.59,
+   "end": 17.717
+  },
+  {
+   "text": "ancient",
+   "start": 17.81,
+   "end": 18.205
+  },
+  {
+   "text": "city",
+   "start": 18.263,
+   "end": 18.542
+  },
+  {
+   "text": "of",
+   "start": 18.658,
+   "end": 18.797
+  },
+  {
+   "text": "Butrint,",
+   "start": 18.913,
+   "end": 19.482
+  },
+  {
+   "text": "a",
+   "start": 19.517,
+   "end": 19.633
+  },
+  {
+   "text": "UNESCO",
+   "start": 19.749,
+   "end": 20.422
+  },
+  {
+   "text": "World",
+   "start": 20.538,
+   "end": 20.91
+  },
+  {
+   "text": "Heritage",
+   "start": 20.98,
+   "end": 21.444
+  },
+  {
+   "text": "Site.",
+   "start": 21.479,
+   "end": 21.874
+  },
+  {
+   "text": "The",
+   "start": 22.117,
+   "end": 22.233
+  },
+  {
+   "text": "best",
+   "start": 22.28,
+   "end": 22.477
+  },
+  {
+   "text": "part?",
+   "start": 22.535,
+   "end": 22.942
+  },
+  {
+   "text": "It",
+   "start": 23.116,
+   "end": 23.255
+  },
+  {
+   "text": "costs",
+   "start": 23.313,
+   "end": 23.603
+  },
+  {
+   "text": "a",
+   "start": 23.638,
+   "end": 23.673
+  },
+  {
+   "text": "fraction",
+   "start": 23.789,
+   "end": 24.3
+  },
+  {
+   "text": "of",
+   "start": 24.335,
+   "end": 24.381
+  },
+  {
+   "text": "the",
+   "start": 24.439,
+   "end": 24.509
+  },
+  {
+   "text": "Greek",
+   "start": 24.555,
+   "end": 24.823
+  },
+  {
+   "text": "islands.",
+   "start": 24.892,
+   "end": 25.264
+  },
+  {
+   "text": "Would",
+   "start": 25.287,
+   "end": 25.438
+  },
+  {
+   "text": "you",
+   "start": 25.461,
+   "end": 25.531
+  },
+  {
+   "text": "go",
+   "start": 25.589,
+   "end": 25.716
+  },
+  {
+   "text": "here?",
+   "start": 25.809,
+   "end": 26.111
+  },
+  {
+   "text": "Tell",
+   "start": 26.285,
+   "end": 26.483
+  },
+  {
+   "text": "me",
+   "start": 26.529,
+   "end": 26.599
+  },
+  {
+   "text": "in",
+   "start": 26.634,
+   "end": 26.692
+  },
+  {
+   "text": "the",
+   "start": 26.715,
+   "end": 26.785
+  },
+  {
+   "text": "comments.",
+   "start": 26.819,
+   "end": 27.586
+  }
+ ]
+}
