@@ -1,0 +1,2 @@
+Déposez ici votre voix off : public/voiceover.mp3
+(nom modifiable dans src/config.ts -> AUDIO.voiceover)
