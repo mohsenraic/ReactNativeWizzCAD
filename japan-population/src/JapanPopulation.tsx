@@ -2,9 +2,10 @@
  * JapanPopulation.tsx — the full video: a <Series> of the 8 scenes, voiceover + music slots,
  * optional captions.
  *
- * Audio files go in public/: voiceover.mp3 (recorded separately, 5:00) and music.mp3 (optional).
- * They are off by default so a render never fails on a missing file; enable with
- *   --props='{"voiceover":true,"music":true}'
+ * Audio files go in public/: voiceover.mp3 (fitted to the timeline by scripts/voiceover/fit_voiceover.py)
+ * and music.mp3 (optional).
+ * Voiceover is on by default (the file is committed); music is off until public/music.mp3 exists:
+ *   --props='{"music":true}'
  */
 import React from 'react';
 import { AbsoluteFill, Audio, Series, interpolate, staticFile, useVideoConfig } from 'remotion';
@@ -25,7 +26,7 @@ export type JapanPopulationProps = {
 };
 
 export const defaultJapanPopulationProps: JapanPopulationProps = {
-  voiceover: false,
+  voiceover: true,
   music: false,
   musicVolume: 0.08,
   captions: false,

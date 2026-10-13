@@ -32,9 +32,23 @@ Quick review stills: `node scripts/render-stills.mjs '[["Scene4-BirthsDeaths", 7
 
 ### Audio
 
-- `public/voiceover.mp3` — the recorded narration (5:00). Prop `voiceover: true`.
+- `public/voiceover.mp3` — the narration, already fitted to the timeline (on by default; `voiceover: false` to mute).
 - `public/music.mp3` — optional bed, looped, faded in/out, at `musicVolume` (default 0.08). Prop `music: true`.
-- Both are off by default so a render never fails on a missing file.
+
+### Re-recording the voiceover
+
+Record the script (`src/data/captions.ts`, word for word, one take), then:
+
+```bash
+pip install vosk                          # offline speech recognition
+# download an English model, e.g. vosk-model-small-en-us-0.15 from https://alphacephei.com/vosk/models
+python3 scripts/voiceover/fit_voiceover.py narration.wav path/to/vosk-model-small-en-us-0.15
+npm run check:data
+```
+
+It transcribes the take, aligns every word to the script, refits the scene lengths (total stays 5:00 with a 10 s
+end screen), re-times all captions — and with them every animation cue — and writes `public/voiceover.mp3`.
+Current take: 95% of script words matched; captions start within 0.7 frames of the voice on average (max 2.7).
 
 ### Timing is keyed to the narration
 
