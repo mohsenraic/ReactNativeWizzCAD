@@ -390,14 +390,15 @@ export const birthMilestones: Milestone[] = [
 /**
  * Crossover (Scene 4). Deaths first exceeded births in 2005 (by ~21K), births edged ahead again
  * in 2006, and deaths have exceeded births every year since 2007. At chart scale the 2005–2007
- * lines are within a few pixels, so the hand-drawn "X" sits on 2007 (matches the narration) and an
- * optional small Caveat footnote can read "first dip: 2005".
+ * lines are within a few pixels, so the hand-drawn "X" sits on 2007 and the Caveat note reads
+ * "for good since 2007", matching the narration. The 2005 dip is explained in the video description
+ * (see DATA_NOTES.md).
  */
 export const crossover = {
   year: 2007,
   label: '2007',
   firstDipYear: 2005,
-  footnote: 'first dip: 2005',
+  footnote: 'for good since 2007',
 } as const;
 
 // IPSS 2023 expected births (Japanese nationals, medium variant) — torn-paper "what they expected" line.

@@ -1,6 +1,6 @@
 /**
  * Scene 4 — Births vs Deaths (1:45–2:20). Two lines with direct labels; births slide past their
- * milestones, deaths turn red and cross them (hand-drawn X on 2007, footnote "first dip: 2005"),
+ * milestones, deaths turn red and cross them (hand-drawn X on 2007, note "for good since 2007"),
  * the natural decline fills red, and the IPSS forecast arrives on torn paper:
  * "what they expected" vs "what happened".
  */
@@ -134,7 +134,7 @@ export const Scene4BirthsDeaths: React.FC = () => {
         at={crossedAt + 4}
         duration={14}
         seed="s4-x"
-        label={{ text: crossover.footnote, x: LEFT + cx - 16, y: TOP + cy - 62, size: 36, anchor: 'end' }}
+        label={{ text: crossover.footnote, x: LEFT + cx - 24, y: TOP + cy + 118, size: 40, anchor: 'end' }}
       />
       <HandDrawnAnnotation
         shape={{ type: 'arrow', from: [LEFT + declX0, TOP + declY], to: [LEFT + declTo, TOP + declY + 6], bend: -0.15 }}

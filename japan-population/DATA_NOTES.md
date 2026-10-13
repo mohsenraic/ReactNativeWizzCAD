@@ -41,8 +41,10 @@ IPSS 2030/2040/2050/2060.
 ## Editorial flags (narration is final — handled visually)
 
 - **2005 vs 2007 crossover.** Deaths first exceeded births in 2005, births led again in 2006, and deaths
-  have led every year since 2007. At chart scale the gap is a few pixels; the X sits on 2007 and an
-  optional Caveat footnote reads "first dip: 2005".
+  have led every year since 2007. At chart scale the gap is a few pixels; the X sits on 2007 with the note
+  "for good since 2007", matching the narration. Put the 2005 detail in the description, e.g.:
+  *"Deaths first outnumbered births briefly in 2005; births edged ahead again in 2006, and deaths have
+  exceeded births every year since 2007."*
 - **"Every year since 1975."** Births fell overall but rose slightly in some years (e.g. 2006, 2010, 2015 —
   MHLW: "decline with repeated increases and decreases"). The chart shows the real line.
 - **"Deaths keep rising."** 2025 deaths fell for the first time in five years (1,605,378 → 1,589,489).
