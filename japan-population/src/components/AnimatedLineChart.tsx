@@ -25,6 +25,7 @@ import { Easing, interpolate, interpolateColors, spring, useCurrentFrame, useVid
 import { COLORS, FONTS, SPRINGS, Tone, toneColors } from '../theme';
 import { valueAt, YearValue } from '../data/japan';
 import { jitter } from '../lib/sketch';
+import { formatNumber } from '../lib/format';
 
 export interface ChartSeries {
   id: string;
@@ -35,7 +36,15 @@ export interface ChartSeries {
   strokeWidth?: number;
   dashed?: boolean;
   /** Draw-on from the first to the last point between these frames. Omit = fully drawn. */
-  draw?: { at: number; duration: number };
+  draw?: {
+    at: number;
+    duration: number;
+    /**
+     * Optional [frame, year] pairs to sync the tip to narration (e.g. reach 2008 on "in 2008").
+     * Overrides at/duration for the reveal; holds between equal years.
+     */
+    keyframes?: Array<[number, number]>;
+  };
   /** Direct label next to the line end; appears when drawing finishes. */
   label?: { text: string; dx?: number; dy?: number; at?: number; size?: number };
   /** White torn-paper band behind the line. */
@@ -67,6 +76,8 @@ export interface ChartMilestone {
   side?: 'above' | 'below';
   /** Pole length in px. */
   length?: number;
+  /** Count a number inside the flag: label becomes `${prefix}${value}${suffix}`. */
+  count?: { to: number; from?: number; decimals?: number; prefix?: string; suffix?: string; duration?: number };
 }
 
 export interface ChartMarker {
@@ -128,11 +139,27 @@ export const makeChartScales = (p: Pick<ChartProps, 'width' | 'height' | 'margin
   return { x, y, plot, valueOf, point: (id, year) => [x(year), y(valueOf(id, year))] };
 };
 
+/** First and last frame of a series' draw-on (keyframes win over at/duration). */
+export const drawSpan = (s: ChartSeries): [number, number] | null => {
+  if (!s.draw) return null;
+  const kf = s.draw.keyframes;
+  if (kf && kf.length >= 2) return [kf[0][0], kf[kf.length - 1][0]];
+  return [s.draw.at, s.draw.at + s.draw.duration];
+};
+
 /** Data x the series has drawn to at `frame`. */
 export const revealX = (s: ChartSeries, frame: number): number => {
   const first = s.data[0].year;
   const last = s.data[s.data.length - 1].year;
   if (!s.draw) return last;
+  const kf = s.draw.keyframes;
+  if (kf && kf.length >= 2) {
+    return interpolate(frame, kf.map((k) => k[0]), kf.map((k) => k[1]), {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.inOut(Easing.sin),
+    });
+  }
   return interpolate(frame, [s.draw.at, s.draw.at + s.draw.duration], [first, last], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
@@ -267,7 +294,7 @@ export const AnimatedLineChart: React.FC<ChartProps> = (props) => {
 
       {/* torn-paper backings sit beneath every line so they never hide real data */}
       {series.filter((s) => s.backing === 'tornPaper').map((s) => (
-        <g key={`backing-${s.id}`} opacity={!s.draw || frame >= s.draw.at ? 1 : 0}>
+        <g key={`backing-${s.id}`} opacity={!drawSpan(s) || frame >= drawSpan(s)![0] ? 1 : 0}>
           <g clipPath={`url(#${uid}-clip-${s.id})`} filter={`url(#${uid}-paper)`}>
             <path
               d={(() => {
@@ -288,11 +315,12 @@ export const AnimatedLineChart: React.FC<ChartProps> = (props) => {
         const color = seriesColor(s);
         const rx = revealX(s, frame);
         const tip: [number, number] = [sc.x(rx), sc.y(valueAt(s.data, rx))];
-        const drawing = s.draw && frame >= s.draw.at && frame < s.draw.at + s.draw.duration;
+        const span = drawSpan(s);
+        const drawing = span !== null && frame >= span[0] && frame < span[1];
         const last = s.data[s.data.length - 1];
-        const labelAt = s.label?.at ?? (s.draw ? s.draw.at + s.draw.duration : 0);
+        const labelAt = s.label?.at ?? (span ? span[1] : 0);
         const labelOpacity = interpolate(frame, [labelAt, labelAt + 12], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-        const started = !s.draw || frame >= s.draw.at;
+        const started = !span || frame >= span[0];
         return (
           <g key={s.id} opacity={(s.opacity ?? 1) * (started ? 1 : 0)}>
             <path
@@ -348,7 +376,16 @@ export const AnimatedLineChart: React.FC<ChartProps> = (props) => {
         const len = (ms.length ?? 90) * spring({ frame: frame - ms.at, fps, config: SPRINGS.snappy });
         const flagS = spring({ frame: frame - ms.at - 6, fps, config: SPRINGS.cutout });
         const ty = up ? py - len : py + len;
-        const fw = ms.label.length * 13 + 30;
+        let text = ms.label;
+        if (ms.count) {
+          const v = interpolate(frame, [ms.at + 4, ms.at + 4 + (ms.count.duration ?? 24)], [ms.count.from ?? 0, ms.count.to], {
+            extrapolateLeft: 'clamp',
+            extrapolateRight: 'clamp',
+            easing: Easing.out(Easing.cubic),
+          });
+          text = `${ms.count.prefix ?? ''}${formatNumber(v, { decimals: ms.count.decimals ?? 0 })}${ms.count.suffix ?? ''}`;
+        }
+        const fw = Math.max(ms.label.length, text.length) * 13 + 30;
         return (
           <g key={i}>
             <line x1={px} y1={py} x2={px} y2={ty} stroke={COLORS.ink} strokeWidth={2.5} />
@@ -356,7 +393,7 @@ export const AnimatedLineChart: React.FC<ChartProps> = (props) => {
             <g transform={`translate(${px} ${up ? ty : ty - 40}) scale(${flagS}) rotate(${jitter(`flag-${i}`, 2)})`}>
               <rect x={0} y={0} width={fw} height={40} fill="#FBFAF6" stroke={COLORS.ink} strokeWidth={2} />
               <text x={15} y={27} fontFamily={FONTS.mono} fontWeight={500} fontSize={21} fill={COLORS.ink}>
-                {ms.label}
+                {text}
               </text>
             </g>
           </g>
@@ -366,7 +403,8 @@ export const AnimatedLineChart: React.FC<ChartProps> = (props) => {
       {props.yearTicker && (() => {
         const s = series.find((q) => q.id === props.yearTicker!.seriesId)!;
         const year = Math.floor(revealX(s, frame));
-        const started = !s.draw || frame >= s.draw.at;
+        const span = drawSpan(s);
+        const started = !span || frame >= span[0];
         return (
           <text
             x={props.yearTicker.x}

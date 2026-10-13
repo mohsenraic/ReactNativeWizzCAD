@@ -37,9 +37,12 @@ export const SceneTransition: React.FC<{
   enter?: TransitionType;
   exit?: TransitionType;
   frames?: number;
-}> = ({ children, enter = 'none', exit = 'none', frames = 12 }) => {
+  /** Defaults to the enclosing sequence's duration. */
+  durationInFrames?: number;
+}> = ({ children, enter = 'none', exit = 'none', frames = 12, durationInFrames: d }) => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
+  const { durationInFrames: seq } = useVideoConfig();
+  const durationInFrames = d ?? seq;
   const ease = Easing.out(Easing.cubic);
   const pIn = enter === 'none' ? 1 : interpolate(frame, [0, frames], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: ease });
   const pOut =

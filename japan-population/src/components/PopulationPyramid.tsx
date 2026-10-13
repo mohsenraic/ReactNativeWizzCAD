@@ -149,7 +149,7 @@ export const PopulationPyramid: React.FC<PyramidProps> = (props) => {
   const tintP = tintFromAge ? interpolate(frame, [tintFromAge.at, tintFromAge.at + 20], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 0;
 
   return (
-    <div style={{ position: 'absolute', width, height, transform: `rotate(${flipDeg}deg)`, transformOrigin: '50% 55%', ...style }}>
+    <div style={{ position: 'absolute', width, height, transform: `rotate(${flipDeg}deg)`, transformOrigin: '50% 50%', ...style }}>
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
         <defs>
           <filter id={`${uid}-strip`} x="-5%" y="-30%" width="110%" height="160%">

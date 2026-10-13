@@ -6,7 +6,9 @@
 
 - **Phase 2 — data** ✔ `src/data/japan.ts`, `src/data/captions.ts`, `src/timeline.ts`, `DATA_NOTES.md`
 - **Phase 3 — components** ✔ `src/components/*`, previewable in the `ComponentGallery` composition
-- **Phase 4 — scenes, final Root** — next
+- **Phase 4 — scenes, final Root** ✔ `src/scenes/*`, `src/JapanPopulation.tsx`, `src/Root.tsx`
+
+Before publishing: replace the placeholder pyramids (`npm run check:data` must pass) and record the voiceover.
 
 ## Run
 
@@ -17,7 +19,28 @@ npm run check:data        # fails while any placeholder dataset remains (current
 npm run typecheck
 ```
 
-Render (Phase 4): `npx remotion render JapanPopulation out/japan.mp4`
+Render the video:
+
+```bash
+npx remotion render JapanPopulation out/japan.mp4
+# with audio + subtitles burned in:
+npx remotion render JapanPopulation out/japan.mp4 --props='{"voiceover":true,"music":true,"captions":true}'
+```
+
+Compositions: `JapanPopulation` (5:00), `Scene1-Hook` … `Scene8-Outro` (one per scene), `ComponentGallery`, `Demo-*`.
+Quick review stills: `node scripts/render-stills.mjs '[["Scene4-BirthsDeaths", 700, "s4"]]'` → `out/stills/s4.png`.
+
+### Audio
+
+- `public/voiceover.mp3` — the recorded narration (5:00). Prop `voiceover: true`.
+- `public/music.mp3` — optional bed, looped, faded in/out, at `musicVolume` (default 0.08). Prop `music: true`.
+- Both are off by default so a render never fails on a missing file.
+
+### Timing is keyed to the narration
+
+Every animation beat uses `cue(scene, "phrase")` (`src/scenes/helpers.tsx`), which reads the frame of the caption
+chunk containing that phrase. After recording the voiceover, re-time `src/data/captions.ts` to the audio (e.g. Whisper
+word timestamps) and the whole video follows. Scene lengths live in `src/timeline.ts`.
 
 ### Fonts
 
@@ -43,8 +66,12 @@ src/
   lib/sfx.tsx            sound-effect slots
   components/            reusable components (each file starts with an @example)
   examples/demos.tsx     usage demos rendered in the gallery
+  scenes/                Scene1Hook … Scene8Outro, helpers (cue, SceneShell, Fade)
+  JapanPopulation.tsx    the <Series> of 8 scenes + voiceover/music slots + captions
+  Root.tsx               compositions
 scripts/check-data.ts    pre-render data check
 scripts/fetch-fonts.sh   local font copies
+scripts/render-stills.mjs  bundle once, render review stills
 ```
 
 ## Components

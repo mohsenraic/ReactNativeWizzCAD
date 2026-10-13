@@ -1,4 +1,4 @@
-export { AnimatedLineChart, makeChartScales, revealX, seriesTip } from './AnimatedLineChart';
+export { AnimatedLineChart, drawSpan, makeChartScales, revealX, seriesTip } from './AnimatedLineChart';
 export type { ChartArea, ChartMarker, ChartMilestone, ChartProps, ChartScales, ChartSeries } from './AnimatedLineChart';
 export { PopulationPyramid, pyramidGeometry, pyramidStateAt, boomIndexAt } from './PopulationPyramid';
 export type { PyramidKeyframe, PyramidProps } from './PopulationPyramid';
