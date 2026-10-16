@@ -16,7 +16,7 @@ Un vieux Livret A, une carte bancaire oubliée, une assurance vie jamais réclam
 📤 Envoie cette vidéo à quelqu'un qui a déjà changé de banque… ou à tes parents.
 🔔 Abonne-toi à @cashenbref : l'argent expliqué simplement.
 
-#cashenbref #ciclade #argentoublié #comptesinactifs #livretA #assurancevie #caissedesdepots #financepersonnelle #educationfinanciere #argent #budget #astuceargent #epargne #conseilsfinance #bonplan #leconomiedutemps #francefinance #reels #astuce #lesavaistu
+#cashenbref #ciclade #argentoublié #comptesinactifs #livretA #assurancevie #caissedesdepots #financepersonnelle #educationfinanciere #argent #budget #astuceargent #epargne #conseilsfinance #bonplan #francefinance #reels #astuce #lesavaistu
 
 ## Version courte (YouTube Shorts — titre)
 De l'argent à ton nom ? Vérifie sur Ciclade (officiel et gratuit) #shorts #argent #ciclade
