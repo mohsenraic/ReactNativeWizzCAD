@@ -22,10 +22,10 @@ Scene cuts are placed in the voice-over's pauses (`CUTS` in `scene.html`, `VO_CU
 
 | Time | Scene |
 |------|-------|
-| 0–4 s | Vault cracks open, lime light leaks out, « TOI ? » tag |
-| 4–8.9 s | Livret A, dusty card and « Assurance vie » envelope drop in |
-| 8.9–15.75 s | Calendar flips to « 10 ANS », bank closes, money flies to the Caisse des dépôts |
-| 15.75–23 s | 164 000 000 € counter, then an envelope reveals 943 € |
-| 23–31.4 s | « 30 ANS » hourglass, the vault stamped with a tricolour slams shut, « 640 M€ perdus » struck through |
-| 31.4–39 s | Phone search « Ciclade » → officiel / gratuit, fake « payant » button crossed out |
-| 39–48 s | Paper plane share, Cash en Bref logo, tagline, « Abonne-toi » button clicked |
+| 0–4.15 s | Vault cracks open, lime light leaks out, « TOI ? » tag |
+| 4.15–9.75 s | Livret A, dusty card and « Assurance vie » envelope drop in |
+| 9.75–15.9 s | Calendar flips to « 10 ANS », bank closes, money flies to the Caisse des dépôts |
+| 15.9–23.25 s | 164 400 000 € returned in 2025, then 943 € average per claim |
+| 23.25–31.3 s | « 30 ANS » hourglass, the vault stamped with a tricolour slams shut, « 640 M€ perdus depuis 2017 » struck through |
+| 31.3–39.2 s | Phone search « Ciclade » → officiel / gratuit, fake « payant » button crossed out |
+| 39.2–48 s | Paper plane share, Cash en Bref logo, tagline, « Abonne-toi » button clicked |

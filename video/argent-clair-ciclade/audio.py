@@ -14,7 +14,7 @@ mus_sfx_cut = np.zeros((N, 2))  # SFX already in final (voice-over) time
 
 # Scene cuts as designed vs. as re-timed to the voice-over pauses (see CUTS in scene.html).
 DESIGN_CUTS = [0, 3, 8, 15, 22, 30, 39, 48]
-VO_CUTS = [0, 4.05, 8.9, 15.75, 23.0, 31.4, 39.05, 48]
+VO_CUTS = [0, 4.15, 9.75, 15.9, 23.25, 31.3, 39.2, 48]
 
 
 def warp(t):

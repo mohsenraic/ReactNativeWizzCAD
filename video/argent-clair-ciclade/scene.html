@@ -31,8 +31,8 @@ const CAP = {
   s2:  [[['DES', 0], ['COMPTES', 0]], [['OUBLIÉS', 1]]],
   s3a: [[['APRÈS', 0]]],
   s3b: [[['TRANSFÉRÉ', 0], ['À', 0], ['LA', 0]], [['CAISSE', 1], ['DES', 1], ['DÉPÔTS', 1]]],
-  s4a: [[['ARGENT', 0], ['NON', 0]], [['RÉCLAMÉ', 1]]],
-  s4b: [[['ET', 0], ['POUR', 0]], [['TOI', 1], ['?', 1]]],
+  s4a: [[['RESTITUÉS', 0]], [['EN', 0], ['2025', 1]]],
+  s4b: [[['EN', 1], ['MOYENNE', 1]], [['PAR', 0], ['DOSSIER', 0]]],
   s5:  [[['APRÈS', 0], ['30 ANS', 1]], [["L'ÉTAT", 1], ['GARDE', 0], ['TOUT', 0]]],
   s6a: [[['CHERCHE', 0], ['SUR', 0]], [['CICLADE', 1]]],
   s6b: [[['NE', 0], ['PAIE', 0]], [['JAMAIS', 1]]],
@@ -492,7 +492,7 @@ function S4(t) {
   const shrink = eio(p(t, 3.2, 3.75));
   if (shrink < 1) {
     const k = eo(p(t, .35, 2.85));
-    const v = k >= 1 ? 164000000 : Math.floor(164000000 * k);
+    const v = k >= 1 ? 164400000 : Math.floor(164400000 * k);
     const land = t > 2.85 ? Math.exp(-(t - 2.85) * 5) : 0;
     const s = eback(p(t, .15, .5)) * (1 - shrink) * (1 + land * .1);
     const gl = ctx.createRadialGradient(540, 960, 10, 540, 960, 520);
@@ -626,6 +626,7 @@ function S5(t) {
     const ck = eback(p(t, 4.65, 5.05)), v = Math.round(640 * eo(p(t, 4.7, 5.9)));
     group(540, 980, ck, 0, 1, () => { sh(30, 16, .5); txt(`${v} M€`, 0, 0, 215, O); });
     group(540, 1160, eback(p(t, 5.5, 5.85)), 0, 1, () => { sh(20, 10, .45); txt('perdus', 0, 0, 104, O); });
+    group(540, 1265, eback(p(t, 5.85, 6.2)), 0, 1, () => txt('depuis 2017', 0, 0, 50, rgba(O, .7), 'IXB'));
     const sk = eio(p(t, 6.25, 6.6));
     if (sk > 0) {
       ctx.save(); ctx.translate(540, 1060); ctx.rotate(-.12);
@@ -680,7 +681,7 @@ function S6(t) {
         rr(-200, -150, 400, 330, 32); ctx.fillStyle = rgba(O, .07); ctx.fill();
         const ck = eback(p(t, 2.75, 3.1));
         group(0, -40, ck, 0, 1, () => { glow(rgba(L, .55), 40); circ(0, 0, 92); ctx.fillStyle = L; ctx.fill(); nosh(); check(0, 0, 92, eo(p(t, 3.0, 3.35)), G); });
-        txt('ciclade.caissedesdepots.fr', 0, 100, 25, rgba(O, .75), 'IXB');
+        txt('ciclade.fr', 0, 100, 34, rgba(O, .75), 'IXB');
       });
       [['officiel', -100, 3.5], ['gratuit', 100, 3.78]].forEach(([lab, x, st]) => {
         group(x * 1.06, 225, eback(p(t, st, st + .35)), 0, 1, () => {
@@ -795,7 +796,7 @@ function S7(t) {
    ===================================================================== */
 // [start, end, scene, designed length]. Cuts sit in the voice-over's pauses; each scene's
 // animation (designed at its original length) is time-scaled to fit its slot.
-const CUTS = [0, 4.05, 8.9, 15.75, 23.0, 31.4, 39.05, 48];
+const CUTS = [0, 4.15, 9.75, 15.9, 23.25, 31.3, 39.2, 48];
 const DESIGN = [3, 5, 7, 7, 8, 9, 9];
 const SC = [S1, S2, S3, S4, S5, S6, S7].map((fn, i) => [CUTS[i], CUTS[i + 1], fn, DESIGN[i]]);
 const TR_IN = .2, TR_OUT = .22;
