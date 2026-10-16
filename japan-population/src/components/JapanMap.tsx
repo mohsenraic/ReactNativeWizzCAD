@@ -18,7 +18,7 @@
 import React, { useId } from 'react';
 import japan from '@svg-maps/japan';
 import { Easing, interpolate, interpolateColors, random, useCurrentFrame } from 'remotion';
-import { COLORS, FONTS } from '../theme';
+import { COLORS, FONTS } from '../../../shared/theme';
 
 interface SvgMapLocation {
   id: string;

@@ -1,0 +1,373 @@
+/**
+ * photos.ts — every photo used in the Uzbekistan video, with its licence and attribution.
+ *
+ * Sources: Wikimedia Commons only (licences checked on each file page via the Commons API, Oct 2026).
+ * Files live in public/photos/ and were downloaded at 3840 px wide (P01: re-encoded from the 3752 px original to 3200 px / 1.5 MB, P18: original 2816 px).
+ * CREDITS.md is the same list formatted for the YouTube description — keep the two in sync.
+ *
+ * Every shot lists 1–2 alternates (not downloaded) in case a crop or mask doesn't work out.
+ */
+import { staticFile } from 'remotion';
+import type { PhotoCredit } from '../../../shared/data/types';
+
+export const PHOTOS = {
+  P01: {
+    id: "P01",
+    file: "P01-registan-golden-hour.jpg",
+    subject: "Registan square, Samarkand — all three madrasas at golden hour",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Registan_square_Samarkand.jpg",
+    author: "Ekrem Canli",
+    license: "CC BY-SA 3.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
+    attributionText: "\"Registan square Samarkand\" by Ekrem Canli, CC BY-SA 3.0, via Wikimedia Commons",
+    width: 3200,
+    height: 2158,
+    taken: "2012-08-05",
+    notes: "Wide, warm evening light. Tilya-Kori's dome sits small at centre: push in toward it before the dome-lift parallax.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:The_Registan.jpg", author: "Artifacts", license: "CC BY-SA 4.0" },
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Registan_01.jpg", author: "Bernard Gagnon", license: "CC0" },
+    ],
+  },
+  P02: {
+    id: "P02",
+    file: "P02-registan-tile-detail.jpg",
+    subject: "Registan tile detail — girih-style star-and-cross mosaic on a madrasa wall",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Decorated_walls_of_Registan_Square_in_Samarkand,_Uzbekistan_-_03.jpg",
+    author: "Koshkinhome",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Decorated walls of Registan Square in Samarkand, Uzbekistan - 03\" by Koshkinhome, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2026-05-16",
+    notes: "A power line/pole touches the top edge — crop the top ~8%.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Decorated_walls_of_Registan_Square_in_Samarkand,_Uzbekistan_-_01.jpg", author: "Koshkinhome", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P03: {
+    id: "P03",
+    file: "P03-shah-i-zinda.jpg",
+    subject: "Shah-i-Zinda necropolis, Samarkand — portal and turquoise domes",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Shah-i-Zinda,_Samarkand_(Shohi-Zinda_majmuasi,_Samarqand,_%D0%A8%D0%B0%D1%85%D0%B8_%D0%97%D0%B8%D0%BD%D0%B4%D0%B0).jpg",
+    author: "Petar Milošević",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Shah-i-Zinda, Samarkand (Shohi-Zinda majmuasi, Samarqand, Шахи Зинда)\" by Petar Milošević, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2594,
+    taken: "2025-09-09",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Shah-i-Zinda,_Samarkand_(Shohi-Zinda_majmuasi,_%D0%A8%D0%B0%D1%85%D0%B8_%D0%97%D0%B8%D0%BD%D0%B4%D0%B0).jpg", author: "Petar Milošević", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P04: {
+    id: "P04",
+    file: "P04-gur-e-amir-dome.jpg",
+    subject: "Gur-e-Amir, Samarkand — ribbed turquoise dome",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Gur-e_Amir_in_Samarkand_3.jpg",
+    author: "Adam Harangozó",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Gur-e Amir in Samarkand 3\" by Adam Harangozó, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2018-07-29",
+    notes: "Clean sky: best candidate for the masked dome-lift.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Gur-e_Amir_in_Samarkand_4.jpg", author: "Adam Harangozó", license: "CC BY-SA 4.0" },
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B5%D1%87%D0%B5%D1%80%D0%BD%D0%B8%D0%B9_%D0%93%D1%83%D1%80-%D0%AD%D0%BC%D0%B8%D1%80.jpg", author: "Arina Pan", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P05: {
+    id: "P05",
+    file: "P05-ulugh-beg-observatory.jpg",
+    subject: "Ulugh Beg observatory, Samarkand — remains of the meridian arc (sextant trench)",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Ulugbek_observatory.jpg",
+    author: "Adam Harangozó",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Ulugbek observatory\" by Adam Harangozó, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2561,
+    taken: "2018-07-30",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Ulugbek_observatory,_entrance.jpg", author: "Adam Harangozó", license: "CC BY-SA 4.0" },
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Ulugh_Beg_Observatory_Museum_02.jpg", author: "Bgag", license: "CC0" },
+    ],
+  },
+  P06: {
+    id: "P06",
+    file: "P06-kalyan-minaret.jpg",
+    subject: "Kalyan minaret and Kalyan mosque courtyard (Po-i-Kalyan), Bukhara",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Po-i-Kalyan_in_Bukhara.jpg",
+    author: "Maksimsokolov",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Po-i-Kalyan in Bukhara\" by Maksimsokolov, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2547,
+    taken: "2023-10-23",
+    notes: "Minaret on the right third; for the tilt-up, crop a tall window around it.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Mosque_and_Minaret_Kalon,_Buchara,_Uzbekistan_(6134299806).jpg", author: "Fabio Achilli from Milano, Italy", license: "CC BY 2.0" },
+    ],
+  },
+  P07: {
+    id: "P07",
+    file: "P07-bukhara-trading-dome.jpg",
+    subject: "Bukhara trading domes (toqi) with the Kalyan minaret and Mir-i-Arab domes behind",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Buchara_Uzbekistan_(6133687879).jpg",
+    author: "Fabio Achilli from Milano, Italy",
+    license: "CC BY 2.0",
+    licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+    attributionText: "\"Buchara Uzbekistan (6133687879)\" by Fabio Achilli from Milano, Italy, CC BY 2.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2880,
+    taken: "2011-08-15",
+    notes: "One cyclist seen from behind, small — not identifiable.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:02025_Toqi_Zargaron.jpg", author: "silar", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P08: {
+    id: "P08",
+    file: "P08-lyab-i-hauz.jpg",
+    subject: "Lyab-i Hauz ensemble, Bukhara — pool framed by mulberry branches",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Labi_Hovuz_03.jpg",
+    author: "Humoyun Mehridinov",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Labi Hovuz 03\" by Humoyun Mehridinov, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2024-06-28",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:%D0%9B%D1%8F%D0%B1%D0%B8_%D0%A5%D0%B0%D1%83%D1%81.jpg", author: "Arina Pan", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P09: {
+    id: "P09",
+    file: "P09-itchan-kala-walls.jpg",
+    subject: "Itchan Kala walls, Khiva — crenellated mud-brick ramparts in warm light",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Itchan_Kala_walls.jpg",
+    author: "Nassima Chahboun",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Itchan Kala walls\" by Nassima Chahboun, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2019-07-25",
+    notes: "Top-down-ish angle: good reference for the illustrated plan.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:City_Walls_of_Itchan_Kala_(Khiva).jpg", author: "Adam Harangozó", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P10: {
+    id: "P10",
+    file: "P10-kalta-minor.jpg",
+    subject: "Kalta Minor minaret, Khiva — seen over the rooftops of Itchan Kala",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Khiva,_Kalta_Minor_Minaret,_Uzbekistan_(6132641582).jpg",
+    author: "Fabio Achilli from Milano, Italy",
+    license: "CC BY 2.0",
+    licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+    attributionText: "\"Khiva, Kalta Minor Minaret, Uzbekistan (6132641582)\" by Fabio Achilli from Milano, Italy, CC BY 2.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2880,
+    taken: "2011-08-13",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Kalta_Minor_seen_from_a_street.jpg", author: "Adam Harangozó", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P11: {
+    id: "P11",
+    file: "P11-khiva-sunset.jpg",
+    subject: "Khiva rooftops at sunset — Kalta Minor and Islam Khoja minaret",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Khiva_skyline.jpg",
+    author: "Nassima Chahboun",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Khiva skyline\" by Nassima Chahboun, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2019-07-25",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Vue_sur_Khiva_(3).jpg", author: "Ji-Elle", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P12: {
+    id: "P12",
+    file: "P12-afrosiyob-train.jpg",
+    subject: "Afrosiyob high-speed train (Talgo 250) at a station platform",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:20230612_Highspeed_UzbekRail145.jpg",
+    author: "Jean Housen",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"20230612 Highspeed UzbekRail145\" by Jean Housen, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2023-06-12",
+    notes: "Photographer's shadow on the platform in the bottom ~25% — crop or mask.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:20230612_Highspeed_UzbekRail143.jpg", author: "Jean Housen", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P13: {
+    id: "P13",
+    file: "P13-tashkent-metro.jpg",
+    subject: "Tashkent metro — Mustaqillik Maydoni station, crystal chandeliers and marble",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Mustaqillik_Maydoni_station_of_Chilanzar_Line_of_Tashkent_Metro_in_Tashkent_Uzbekistan.jpg",
+    author: "Tim Adams",
+    license: "CC BY 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+    attributionText: "\"Mustaqillik Maydoni station of Chilanzar Line of Tashkent Metro in Tashkent Uzbekistan\" by Tim Adams, CC BY 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2024-10-03",
+    notes: "Not Kosmonavtlar: picked because the narration cues chandeliers/marble. Kosmonavtlar is the alternate.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Kosmonavtlar_Station_of_Tashkent_Metro_6.jpg", author: "Adam Harangozó", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P14: {
+    id: "P14",
+    file: "P14-plov-kazan.jpg",
+    subject: "Plov cooking in a kazan (Fergana-style osh)",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Farg%27onacha_osh.jpg",
+    author: "UzbekistanWikiEditor",
+    license: "CC0",
+    licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0",
+    attributionText: "\"Farg'onacha osh\" by UzbekistanWikiEditor, CC0 1.0 (public domain), via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2023-11-29",
+    notes: "Close-up of one kazan, not a giant one: don't measure it on screen. Keep the 'feeds hundreds' line as a stylized annotation.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Urazmat-Plov.jpg", author: "Ji-Elle", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P15: {
+    id: "P15",
+    file: "P15-chorsu-bazaar.jpg",
+    subject: "Chorsu bazaar, Tashkent — the tiled main dome",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Chorsu_Bazaar_in_Tashkent.jpg",
+    author: "Adam Harangozó",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Chorsu Bazaar in Tashkent\" by Adam Harangozó, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2018-07-27",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Chorsu_Bazaar_in_Tashkent_3.jpg", author: "Adam Harangozó", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P16: {
+    id: "P16",
+    file: "P16-tian-shan-amirsoy.jpg",
+    subject: "Tian Shan: snow-covered Ugam-Chatkal ridges seen from Amirsoy, Tashkent region",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D1%81_%D0%B3%D0%BE%D1%80%D0%BD%D0%BE%D0%BB%D1%8B%D0%B6%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%81%D0%B0_%22%D0%90%D0%BC%D0%B8%D1%80%D1%81%D0%BE%D0%B9%22_34.jpg",
+    author: "Iplossusvulpes19",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Вид с горнолыжного комплекса \"Амирсой\" 34\" by Iplossusvulpes19, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2220,
+    taken: "2026-03-22",
+    notes: "Same range as Chimgan (Ugam-Chatkal national park).",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D1%81_%D0%B3%D0%BE%D1%80%D0%BD%D0%BE%D0%BB%D1%8B%D0%B6%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%81%D0%B0_%22%D0%90%D0%BC%D0%B8%D1%80%D1%81%D0%BE%D0%B9%22_25.jpg", author: "Iplossusvulpes19", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P17: {
+    id: "P17",
+    file: "P17-ikat-silk-loom.jpg",
+    subject: "Ikat silk on a hand loom, Yodgorlik silk factory, Margilan (Fergana Valley)",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Yodgorlik_Silk_Factory_(5982821398).jpg",
+    author: "Peretz Partensky from San Francisco, USA",
+    license: "CC BY 2.0",
+    licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+    attributionText: "\"Yodgorlik Silk Factory (5982821398)\" by Peretz Partensky from San Francisco, USA, CC BY 2.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2880,
+    taken: "2009-09-19",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Uzbekistan,_Bukhara_-_Woman%E2%80%99s_robe_-_2009.267_-_Cleveland_Museum_of_Art.tif", author: "Cleveland Museum of Art", license: "CC0" },
+    ],
+  },
+  P18: {
+    id: "P18",
+    file: "P18-rishtan-ceramics.jpg",
+    subject: "Rishtan ceramics — plates and a vase on shelves, Rustam Usmanov's workshop, Rishtan",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:22_Taller_cer%C3%A0mic_de_Rustam_Usmanov,_Burhoniddin_Roshidoni_Ko%27chasi_6_(Rixtan).jpg",
+    author: "Enric",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"22 Taller ceràmic de Rustam Usmanov, Burhoniddin Roshidoni Ko'chasi 6 (Rixtan)\" by Enric, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 2816,
+    height: 2112,
+    taken: "2018-04-07",
+    notes: "2816 px wide: still ≥1920, but don't zoom past ~1.4×.",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:10_Taller_cer%C3%A0mic_de_Rustam_Usmanov,_Burhoniddin_Roshidoni_Ko%27chasi_6_(Rixtan).jpg", author: "Enric", license: "CC BY-SA 4.0" },
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Sopol_lagan_blue_2_front.png", author: "AIDEPCUL", license: "CC BY 4.0" },
+    ],
+  },
+  P19: {
+    id: "P19",
+    file: "P19-moynaq-ships.jpg",
+    subject: "Moynaq ship graveyard — a rusting fishing boat on the former Aral seabed",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Aral_Sea_Moynaq_Karakalpakstan_Uzbekistan_September_2025_Ph_Khusen_Rustamov-_09.jpg",
+    author: "Khusen Rustamov / Koshkinhome",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+    attributionText: "\"Aral Sea Moynaq Karakalpakstan Uzbekistan September 2025 Ph Khusen Rustamov- 09\" by Khusen Rustamov / Koshkinhome, CC BY-SA 4.0, via Wikimedia Commons",
+    width: 3840,
+    height: 2560,
+    taken: "2025-10-13",
+    notes: "File page: author 'Koshkinhome', description says 'Photo by Khusen Rustamov' — credit both (see CREDITS.md).",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Aral_Sea_Moynaq_Karakalpakstan_Uzbekistan_September_2025_Ph_Khusen_Rustamov-_13.jpg", author: "Khusen Rustamov / Koshkinhome", license: "CC BY-SA 4.0" },
+    ],
+  },
+  P20: {
+    id: "P20",
+    file: "P20-ayaz-kala.jpg",
+    subject: "Ayaz-Kala desert fortress, Karakalpakstan — aerial view from the hill",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Ayaz-Kala-2.jpg",
+    author: "Bernard Gagnon",
+    license: "CC0",
+    licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0",
+    attributionText: "\"Ayaz-Kala-2\" by Bernard Gagnon, CC0 1.0 (public domain), via Wikimedia Commons",
+    width: 3840,
+    height: 2376,
+    taken: "2023-10-05",
+    alternates: [
+      { sourceUrl: "https://commons.wikimedia.org/wiki/File:Ayaz-Kala_02.jpg", author: "Bgag", license: "CC0" },
+    ],
+  },
+} satisfies Record<string, PhotoCredit>;
+
+export type PhotoId = keyof typeof PHOTOS;
+
+/**
+ * Hand-traced lift masks (SVG paths in SOURCE-IMAGE pixels) for <PhotoCutout lift={…}>.
+ * P04: the ribbed dome of Gur-e-Amir incl. its finial, cut along the drum line.
+ */
+export const PHOTO_MASKS = {
+  P04dome:
+    'M1372,472 L1380,380 L1400,288 L1420,380 L1428,472 C1700,490 1960,640 2180,880 C2300,1100 2340,1350 2340,1640 L2320,1780 L580,1780 C545,1680 540,1500 545,1280 C560,1000 640,760 800,600 C1000,500 1200,470 1372,472 Z',
+} as const;
+
+/** Props shared by every <PhotoCutout> of a registered photo: source, natural size, credit line. */
+export const photoProps = (id: PhotoId) => ({
+  src: photoSrc(id),
+  naturalSize: [PHOTOS[id].width, PHOTOS[id].height] as [number, number],
+  credit: `${PHOTOS[id].author} / ${PHOTOS[id].license}`,
+});
+
+export const photoSrc = (id: PhotoId): string => staticFile(`photos/${PHOTOS[id].file}`);
+
+/** Short on-screen tag for the bottom-right credit: "PHOTO: AUTHOR / LICENCE". */
+export const photoTag = (id: PhotoId): string => `PHOTO: ${PHOTOS[id].author} / ${PHOTOS[id].license}`;

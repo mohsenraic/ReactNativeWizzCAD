@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { AbsoluteFill, Sequence, useCurrentFrame } from 'remotion';
-import { COLORS, FONTS } from '../theme';
+import { COLORS, FONTS } from '../../../shared/theme';
 import {
   AnimatedLineChart, BigCounter, CameraRig, ChapterCard, Cutout, DocumentCard, HandDrawnAnnotation,
   IconCard, JapanMap, KineticTitle, LoopDiagram, PaperBackground, ParallaxLayer, PopulationPyramid,
@@ -17,7 +17,7 @@ import {
   totalPopulation, vital2025, lossFromPeakMillions, birthMilestones, crossover, akiya, foreignResidents,
   policySpending, robotics, mapFocus,
 } from '../data/japan';
-import { MINUS, formatCompact, formatNumber } from '../lib/format';
+import { MINUS, formatCompact, formatNumber } from '../../../shared/lib/format';
 
 export const DEMO_FRAMES = 180;
 

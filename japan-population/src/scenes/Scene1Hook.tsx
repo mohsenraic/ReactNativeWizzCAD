@@ -7,8 +7,8 @@ import React from 'react';
 import { Easing, interpolate, random, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { BigCounter, Cutout, DocumentCard, HandDrawnAnnotation, SourceTag } from '../components';
 import { austin, vital2025 } from '../data/japan';
-import { MINUS } from '../lib/format';
-import { COLORS, FONTS, SPRINGS } from '../theme';
+import { MINUS } from '../../../shared/lib/format';
+import { COLORS, FONTS, SPRINGS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { SceneShell, cue, useFade } from './helpers';
 

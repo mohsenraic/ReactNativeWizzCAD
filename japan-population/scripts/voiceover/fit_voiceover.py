@@ -7,8 +7,9 @@ fit_voiceover.py — fit a recorded narration to the video.
 1. Transcribes the audio offline with Vosk (word timestamps).
 2. Aligns the words to the exact script in src/data/captions.ts (numbers expanded to how they're
    spoken: "1970s" → "nineteen seventies").
-3. Sets each scene's length = spoken length + 0.4 s lead-in + a share of the spare time, keeping the
-   total at 9000 frames and a clean 10 s end screen in Scene 8 → rewrites src/timeline.ts.
+3. Sets each scene's length = 0.4 s lead-in + spoken length + 1 s tail (no padding to a fixed total),
+   with a clean 10 s end screen in Scene 8 → rewrites src/timeline.ts (incl. TOTAL_FRAMES).
+   Pauses inside a scene are kept as recorded — speak with short pauses, or trim them in the take.
 4. Re-times every caption chunk → rewrites src/data/captions.ts (every visual cue follows).
 5. Places each scene's audio at its scene start → public/voiceover.mp3.
 
@@ -19,7 +20,7 @@ The narration must follow the script word for word (one take, all 8 scenes in or
 import array, difflib, json, math, os, re, subprocess, sys, tempfile, wave
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-FPS, TOTAL, END, LEAD = 30, 9000, 300, 0.4
+FPS, END, LEAD, TAIL = 30, 300, 0.4, 1.0
 
 # ── spoken forms of numbers ──────────────────────────────────────────────────
 ONES = 'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'.split()
@@ -94,20 +95,16 @@ def main(audio, model_dir):
     last = {s: max(k for k, c in enumerate(chunks) if c['scene'] == s) for s in scenes}
     spokenlen = {s: T[last[s]][1] - T[first[s]][0] for s in scenes}
     base = {s: spokenlen[s] + LEAD for s in scenes}
-    d_last = math.ceil(base[scenes[-1]] * FPS) + END + 6
-    rest = TOTAL - d_last
-    slack = rest / FPS - sum(base[s] for s in scenes[:-1])
-    if slack < 0: sys.exit(f'Narration is {-slack:.1f} s too long for a 5:00 video — raise TOTAL_FRAMES or trim.')
-    w = sum(spokenlen[s] for s in scenes[:-1])
-    dur = {s: math.floor((base[s] + slack * spokenlen[s] / w) * FPS) for s in scenes[:-1]}
-    for s in sorted(dur, key=lambda s: -spokenlen[s])[: rest - sum(dur.values())]: dur[s] += 1
-    dur[scenes[-1]] = d_last
+    dur = {s: math.ceil((base[s] + TAIL) * FPS) for s in scenes[:-1]}
+    dur[scenes[-1]] = math.ceil(base[scenes[-1]] * FPS) + END + 6
+    TOTAL = sum(dur.values())
     start, acc = {}, 0
     for s in scenes: start[s] = acc; acc += dur[s]
 
     p = os.path.join(ROOT, 'src/timeline.ts'); src = open(p).read()
     for s in scenes:
         src = re.sub(r"(id: %d,\s*name: '[A-Za-z]+',\s*from: )\d+(,\s*durationInFrames: )\d+" % s, lambda m: f'{m.group(1)}{start[s]}{m.group(2)}{dur[s]}', src)
+    src = re.sub(r'export const TOTAL_FRAMES = \d+;', f'export const TOTAL_FRAMES = {TOTAL};', src)
     src = re.sub(r'narrationWindow: \{ from: 0, to: \d+ - END_SCREEN_FRAMES', f'narrationWindow: {{ from: 0, to: {dur[scenes[-1]]} - END_SCREEN_FRAMES', src)
     fmt = lambda f: f'{int(f / FPS) // 60}:{int(f / FPS) % 60:02d}'
     rows = '\n'.join(f' *   {s}      {fmt(start[s])}–{fmt(start[s] + dur[s])}   {dur[s] / FPS:5.1f} s' for s in scenes)

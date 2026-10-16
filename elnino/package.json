@@ -1,0 +1,38 @@
+{
+  "name": "elnino",
+  "version": "1.0.0",
+  "private": true,
+  "description": "How One Patch of Ocean Controls the World's Weather — Remotion explainer",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render ElNino2026 out/elnino.mp4",
+    "typecheck": "tsc --noEmit",
+    "fonts:local": "bash scripts/fetch-fonts.sh",
+    "stills": "node scripts/render-stills.mjs",
+    "check:data": "tsx scripts/check-data.ts",
+    "voiceover:fit": "python3 scripts/voiceover/fit_voiceover.py",
+    "preview": "bash scripts/make-preview.sh"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.535",
+    "@remotion/fonts": "4.0.535",
+    "@remotion/google-fonts": "4.0.535",
+    "d3-geo": "3.1.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.535",
+    "topojson-client": "3.1.0",
+    "world-atlas": "2.0.2"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "3.1.0",
+    "@types/geojson": "7946.0.16",
+    "@types/react": "18.3.12",
+    "@types/topojson-client": "3.1.5",
+    "@types/topojson-specification": "1.0.5",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3",
+    "@remotion/bundler": "4.0.535",
+    "@remotion/renderer": "4.0.535"
+  }
+}

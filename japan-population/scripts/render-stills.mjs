@@ -6,9 +6,10 @@
 import { bundle } from '@remotion/bundler';
 import { renderStill, selectComposition } from '@remotion/renderer';
 import path from 'node:path';
+import { makeWebpackOverride } from '../../shared/remotion/webpack-override.mjs';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const jobs = JSON.parse(process.argv[2]); // [[compId, frame, outName], ...]
-const serveUrl = await bundle({ entryPoint: path.join(root, 'src/index.ts'), publicDir: path.join(root, 'public') });
+const serveUrl = await bundle({ entryPoint: path.join(root, 'src/index.ts'), publicDir: path.join(root, 'public'), webpackOverride: makeWebpackOverride(root) });
 const inputProps = { fonts: 'local' };
 const browserExecutable = process.env.REMOTION_BROWSER ?? null;
 const cache = {};

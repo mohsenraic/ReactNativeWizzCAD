@@ -8,8 +8,8 @@ import React from 'react';
 import { AnimatedLineChart, HandDrawnAnnotation, SourceTag, makeChartScales } from '../components';
 import type { ChartProps } from '../components';
 import { birthMilestones, birthsSeries, crossover, deathsSeries, ipssBirthsForecast } from '../data/japan';
-import { formatCompact } from '../lib/format';
-import { COLORS } from '../theme';
+import { formatCompact } from '../../../shared/lib/format';
+import { COLORS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { SceneShell, cue } from './helpers';
 

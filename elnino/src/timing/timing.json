@@ -1,0 +1,531 @@
+{
+ "fps": 30,
+ "totalFrames": 6907,
+ "endScreenFrames": 240,
+ "speed": 1.1,
+ "pauseCap": 0.3,
+ "scenes": [
+  {
+   "id": 1,
+   "from": 0,
+   "durationInFrames": 616,
+   "narrationFrom": 8,
+   "narrationTo": 606,
+   "audio": [
+    0.07,
+    19.99
+   ]
+  },
+  {
+   "id": 2,
+   "from": 616,
+   "durationInFrames": 753,
+   "narrationFrom": 14,
+   "narrationTo": 743,
+   "audio": [
+    19.99,
+    44.29
+   ]
+  },
+  {
+   "id": 3,
+   "from": 1369,
+   "durationInFrames": 1249,
+   "narrationFrom": 14,
+   "narrationTo": 1239,
+   "audio": [
+    44.29,
+    85.134
+   ]
+  },
+  {
+   "id": 4,
+   "from": 2618,
+   "durationInFrames": 1053,
+   "narrationFrom": 14,
+   "narrationTo": 1043,
+   "audio": [
+    85.134,
+    119.444
+   ]
+  },
+  {
+   "id": 5,
+   "from": 3671,
+   "durationInFrames": 1273,
+   "narrationFrom": 14,
+   "narrationTo": 1263,
+   "audio": [
+    119.444,
+    161.094
+   ]
+  },
+  {
+   "id": 6,
+   "from": 4944,
+   "durationInFrames": 718,
+   "narrationFrom": 14,
+   "narrationTo": 708,
+   "audio": [
+    161.094,
+    184.214
+   ]
+  },
+  {
+   "id": 7,
+   "from": 5662,
+   "durationInFrames": 589,
+   "narrationFrom": 8,
+   "narrationTo": 579,
+   "audio": [
+    184.214,
+    203.234
+   ]
+  },
+  {
+   "id": 8,
+   "from": 6251,
+   "durationInFrames": 656,
+   "narrationFrom": 8,
+   "narrationTo": 406,
+   "audio": [
+    203.234,
+    216.504
+   ]
+  }
+ ],
+ "anchors": {
+  "1": {
+   "right now": {
+    "from": 10,
+    "to": 26
+   },
+   "patch": {
+    "from": 84,
+    "to": 95
+   },
+   "heating": {
+    "from": 117,
+    "to": 126
+   },
+   "never recorded": {
+    "from": 145,
+    "to": 170
+   },
+   "thousands": {
+    "from": 196,
+    "to": 209
+   },
+   "australia": {
+    "from": 342,
+    "to": 359
+   },
+   "peru floods": {
+    "from": 391,
+    "to": 416
+   },
+   "coffee": {
+    "from": 466,
+    "to": 478
+   },
+   "its name": {
+    "from": 486,
+    "to": 505
+   },
+   "el nino": {
+    "from": 510,
+    "to": 528
+   },
+   "strongest": {
+    "from": 564,
+    "to": 580
+   }
+  },
+  "2": {
+   "to understand": {
+    "from": 16,
+    "to": 33
+   },
+   "equator": {
+    "from": 98,
+    "to": 112
+   },
+   "trade winds": {
+    "from": 148,
+    "to": 169
+   },
+   "east to west": {
+    "from": 184,
+    "to": 208
+   },
+   "push warm": {
+    "from": 276,
+    "to": 295
+   },
+   "piles up": {
+    "from": 355,
+    "to": 368
+   },
+   "half a metre": {
+    "from": 450,
+    "to": 467
+   },
+   "meanwhile": {
+    "from": 508,
+    "to": 520
+   },
+   "cold water rises": {
+    "from": 552,
+    "to": 582
+   },
+   "warm in the west": {
+    "from": 625,
+    "to": 652
+   },
+   "cold in the east": {
+    "from": 661,
+    "to": 686
+   },
+   "default": {
+    "from": 718,
+    "to": 727
+   }
+  },
+  "3": {
+   "something breaks": {
+    "from": 46,
+    "to": 70
+   },
+   "weaken": {
+    "from": 106,
+    "to": 112
+   },
+   "reverse": {
+    "from": 135,
+    "to": 150
+   },
+   "sloshing": {
+    "from": 230,
+    "to": 249
+   },
+   "bathtub": {
+    "from": 294,
+    "to": 307
+   },
+   "stops rising": {
+    "from": 353,
+    "to": 377
+   },
+   "heats up": {
+    "from": 413,
+    "to": 428
+   },
+   "evaporation": {
+    "from": 500,
+    "to": 520
+   },
+   "rain moves": {
+    "from": 618,
+    "to": 637
+   },
+   "storms": {
+    "from": 660,
+    "to": 670
+   },
+   "atmosphere": {
+    "from": 803,
+    "to": 814
+   },
+   "jet streams": {
+    "from": 912,
+    "to": 935
+   },
+   "monsoons": {
+    "from": 948,
+    "to": 967
+   },
+   "fishermen": {
+    "from": 1015,
+    "to": 1026
+   },
+   "christmas": {
+    "from": 1121,
+    "to": 1135
+   },
+   "the child": {
+    "from": 1181,
+    "to": 1197
+   },
+   "baby jesus": {
+    "from": 1214,
+    "to": 1233
+   }
+  },
+  "4": {
+   "scientists track": {
+    "from": 16,
+    "to": 40
+   },
+   "one box": {
+    "from": 64,
+    "to": 80
+   },
+   "three point four": {
+    "from": 148,
+    "to": 170
+   },
+   "half a degree": {
+    "from": 200,
+    "to": 215
+   },
+   "declared": {
+    "from": 284,
+    "to": 297
+   },
+   "this year": {
+    "from": 306,
+    "to": 320
+   },
+   "world meteorological": {
+    "from": 368,
+    "to": 390
+   },
+   "three point seven": {
+    "from": 453,
+    "to": 484
+   },
+   "peak": {
+    "from": 571,
+    "to": 577
+   },
+   "firmly": {
+    "from": 632,
+    "to": 643
+   },
+   "one hundred percent": {
+    "from": 722,
+    "to": 744
+   },
+   "february": {
+    "from": 781,
+    "to": 787
+   },
+   "giants": {
+    "from": 837,
+    "to": 850
+   },
+   "nineteen eighty two": {
+    "from": 875,
+    "to": 904
+   },
+   "nineteen ninety seven": {
+    "from": 908,
+    "to": 939
+   },
+   "twenty fifteen": {
+    "from": 948,
+    "to": 971
+   },
+   "same league": {
+    "from": 999,
+    "to": 1014
+   }
+  },
+  "5": {
+   "on the ground": {
+    "from": 43,
+    "to": 55
+   },
+   "reshuffles": {
+    "from": 126,
+    "to": 143
+   },
+   "indonesia": {
+    "from": 171,
+    "to": 189
+   },
+   "drought brings": {
+    "from": 277,
+    "to": 294
+   },
+   "wildfires": {
+    "from": 356,
+    "to": 377
+   },
+   "southern africa": {
+    "from": 386,
+    "to": 406
+   },
+   "monsoon": {
+    "from": 464,
+    "to": 478
+   },
+   "amazon": {
+    "from": 526,
+    "to": 538
+   },
+   "too much water": {
+    "from": 597,
+    "to": 619
+   },
+   "peru and ecuador": {
+    "from": 639,
+    "to": 663
+   },
+   "southern brazil": {
+    "from": 766,
+    "to": 792
+   },
+   "united states": {
+    "from": 858,
+    "to": 884
+   },
+   "east africa": {
+    "from": 895,
+    "to": 913
+   },
+   "wetter": {
+    "from": 938,
+    "to": 946
+   },
+   "dice": {
+    "from": 998,
+    "to": 1005
+   },
+   "world meteorological": {
+    "from": 1056,
+    "to": 1069
+   },
+   "same ocean": {
+    "from": 1203,
+    "to": 1222
+   },
+   "opposite": {
+    "from": 1231,
+    "to": 1241
+   }
+  },
+  "6": {
+   "you don't": {
+    "from": 16,
+    "to": 25
+   },
+   "economic": {
+    "from": 93,
+    "to": 107
+   },
+   "cocoa": {
+    "from": 130,
+    "to": 136
+   },
+   "coffee": {
+    "from": 143,
+    "to": 161
+   },
+   "palm oil": {
+    "from": 164,
+    "to": 187
+   },
+   "rice": {
+    "from": 187,
+    "to": 200
+   },
+   "sugar": {
+    "from": 204,
+    "to": 215
+   },
+   "higher prices": {
+    "from": 313,
+    "to": 331
+   },
+   "off peru": {
+    "from": 370,
+    "to": 386
+   },
+   "anchovies": {
+    "from": 425,
+    "to": 441
+   },
+   "fishmeal": {
+    "from": 521,
+    "to": 527
+   },
+   "past strong": {
+    "from": 577,
+    "to": 596
+   },
+   "trillions": {
+    "from": 643,
+    "to": 663
+   }
+  },
+  "7": {
+   "one more twist": {
+    "from": 19,
+    "to": 35
+   },
+   "new heat": {
+    "from": 73,
+    "to": 86
+   },
+   "moves heat": {
+    "from": 118,
+    "to": 130
+   },
+   "on top": {
+    "from": 207,
+    "to": 216
+   },
+   "records": {
+    "from": 388,
+    "to": 399
+   },
+   "twenty sixteen": {
+    "from": 408,
+    "to": 430
+   },
+   "twenty twenty four": {
+    "from": 451,
+    "to": 475
+   },
+   "twenty twenty seven": {
+    "from": 527,
+    "to": 555
+   }
+  },
+  "8": {
+   "natural": {
+    "from": 33,
+    "to": 49
+   },
+   "thousands of years": {
+    "from": 76,
+    "to": 108
+   },
+   "what's new": {
+    "from": 117,
+    "to": 136
+   },
+   "patch of ocean": {
+    "from": 213,
+    "to": 237
+   },
+   "weather": {
+    "from": 307,
+    "to": 313
+   },
+   "food": {
+    "from": 323,
+    "to": 336
+   },
+   "their year": {
+    "from": 350,
+    "to": 365
+   },
+   "where to look": {
+    "from": 387,
+    "to": 400
+   }
+  }
+ }
+}

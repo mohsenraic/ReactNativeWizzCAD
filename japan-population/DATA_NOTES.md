@@ -23,17 +23,22 @@ tables and press reports that quote them.
 | Robotics card | placeholder | **38% of world robot production** | IFR, July 2025 |
 | IPSS line | 2030/40/50/60 values (unconfirmed) | **2045: 108.8M, 2056: <100M, 2070: 87.0M** | IPSS 2023 via press |
 | IPSS births forecast | invented shape | **2025: 749K, 2040: 675K** (secondary, TODO) | ISVD analysis |
-| Pyramid 2025 total | 123.8M | 123.0M (placeholder rescaled to census) | — |
+| Pyramids (all four) | hand-shaped placeholder | official tables, Oct 2026: 83.2M / 123.3M / 123.0M / 87.0M; 65+ 4.9% / 12.1% / 29.4% / 38.7% | see `japan.ts` §4 |
 
 Dropped (could not confirm, not needed for the story): births/deaths 1965, deaths 2010, population 1984,
 IPSS 2030/2040/2050/2060.
 
 ## Still open
 
-1. **Population pyramids (all four years) — PLACEHOLDER.** Spreadsheet-only sources, blocked here.
-   Download the tables listed in `japan.ts` §4 (or allow `www.e-stat.go.jp` and `www.ipss.go.jp` in the
-   environment's network settings) and they drop straight in.
-2. Census totals 1985, 1990, 1995 (121.049 / 123.611 / 125.570M) — standard values, not re-confirmed.
+1. ~~Population pyramids — PLACEHOLDER.~~ **Resolved October 2026.** Real data in `japan.ts` §4:
+   - 1950: Census report via IPSS Population Statistics 2026, Table 2-1 (excl. Okinawa, sums to 83,199,637 minus 4,670 age-unknown).
+     https://www.ipss.go.jp/syoushika/tohkei/Data/Popular2026/T02-01.files/sheet001.htm
+   - 1990: e-Stat census time series Table 2 (statInfId 000001085926) for 0–84; 85–89 / 90–94 / 95+ from the same census
+     via UN Demographic Yearbook (data.un.org POP, table 22) — sums match e-Stat's 85+ exactly. 326,357 age-unknown omitted (bars total 123.3M vs 123.6M census).
+   - 2025: 2025 Census basic complete tabulation, Table 2-3, unknowns-imputed reference table (e-Stat statInfId 000040506655).
+   - 2070: IPSS 2023 medium variant, Table 1-9A. https://www.ipss.go.jp/pp-zenkoku/j/zenkoku2023/db_zenkoku2023/s_tables/1-9a.xlsx
+   - Top bar "95+" = 95–99 + 100 and over in every year.
+2. ~~Census totals 1985, 1990, 1995~~ — confirmed Oct 2026 against e-Stat census time series T2 (121,048,923 / 123,611,167 / 125,570,246).
 3. Final death counts 2005 (1,083,796) and 2006 (1,084,450) — the crossover logic holds either way.
 4. IPSS births forecast points (749K in 2025, 675K in 2040) — secondary source only.
 5. Foreign residents: the end-June 2026 count is due around now; swap it in if it's a new record.

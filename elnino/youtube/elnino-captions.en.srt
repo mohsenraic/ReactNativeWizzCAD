@@ -1,0 +1,504 @@
+1
+00:00:00,347 --> 00:00:02,017
+Right now, in the middle of the Pacific
+
+2
+00:00:02,057 --> 00:00:04,357
+Ocean, a patch of water is heating up to
+
+3
+00:00:04,397 --> 00:00:06,167
+levels never recorded before.
+
+4
+00:00:06,317 --> 00:00:07,837
+It's thousands of kilometres from any
+
+5
+00:00:07,877 --> 00:00:08,737
+major city.
+
+6
+00:00:08,777 --> 00:00:10,217
+And yet, over the next few months,
+
+7
+00:00:10,367 --> 00:00:11,917
+it will help decide whether Australia
+
+8
+00:00:11,957 --> 00:00:14,027
+burns, whether Peru floods,
+
+9
+00:00:14,177 --> 00:00:16,067
+and how much you pay for your morning coffee.
+
+10
+00:00:16,172 --> 00:00:17,717
+Its name is El Niño.
+
+11
+00:00:17,867 --> 00:00:19,297
+And this one could be one of the strongest
+
+12
+00:00:19,337 --> 00:00:20,237
+ever measured.
+
+13
+00:00:21,050 --> 00:00:22,060
+To understand El Niño,
+
+14
+00:00:22,100 --> 00:00:23,330
+start with a normal year.
+
+15
+00:00:23,480 --> 00:00:25,390
+Along the equator, steady winds called the
+
+16
+00:00:25,430 --> 00:00:27,590
+trade winds blow from east to west,
+
+17
+00:00:27,740 --> 00:00:29,450
+from South America toward Asia.
+
+18
+00:00:29,510 --> 00:00:31,270
+They push warm surface water across the
+
+19
+00:00:31,310 --> 00:00:33,460
+Pacific, so it piles up near Indonesia and
+
+20
+00:00:33,500 --> 00:00:34,270
+Australia.
+
+21
+00:00:34,310 --> 00:00:35,830
+There, the sea is actually about half a
+
+22
+00:00:35,870 --> 00:00:37,280
+metre higher than off Peru.
+
+23
+00:00:37,430 --> 00:00:38,810
+Meanwhile, off South America,
+
+24
+00:00:38,900 --> 00:00:41,180
+cold water rises from the deep to replace it.
+
+25
+00:00:41,330 --> 00:00:43,520
+Warm in the west, cold in the east.
+
+26
+00:00:43,670 --> 00:00:45,200
+That's the Pacific's default setting.
+
+27
+00:00:46,150 --> 00:00:48,100
+Now, every few years, something breaks.
+
+28
+00:00:48,250 --> 00:00:49,440
+The trade winds weaken.
+
+29
+00:00:49,480 --> 00:00:50,740
+Sometimes they even reverse.
+
+30
+00:00:50,890 --> 00:00:52,530
+And all that warm water piled up in the
+
+31
+00:00:52,570 --> 00:00:54,720
+west starts sloshing back east,
+
+32
+00:00:54,760 --> 00:00:55,990
+like water in a bathtub.
+
+33
+00:00:56,140 --> 00:00:58,330
+The cold water off Peru stops rising.
+
+34
+00:00:58,480 --> 00:01:00,010
+The eastern Pacific heats up.
+
+35
+00:01:00,160 --> 00:01:02,220
+This matters because warm ocean means more
+
+36
+00:01:02,260 --> 00:01:03,863
+evaporation, more clouds,
+
+37
+00:01:03,903 --> 00:01:04,650
+more rain.
+
+38
+00:01:04,690 --> 00:01:06,060
+So when the warm water moves,
+
+39
+00:01:06,100 --> 00:01:07,360
+the rain moves with it.
+
+40
+00:01:07,510 --> 00:01:09,060
+The storms that normally soak Indonesia
+
+41
+00:01:09,100 --> 00:01:11,040
+drift toward the middle of the Pacific and
+
+42
+00:01:11,080 --> 00:01:11,790
+South America.
+
+43
+00:01:11,830 --> 00:01:13,556
+And because the atmosphere is connected,
+
+44
+00:01:13,706 --> 00:01:15,446
+this shift ripples across the planet,
+
+45
+00:01:15,596 --> 00:01:17,776
+bending jet streams and shifting monsoons
+
+46
+00:01:17,816 --> 00:01:19,256
+thousands of kilometres away.
+
+47
+00:01:19,406 --> 00:01:21,476
+Fishermen in Peru noticed it centuries ago:
+
+48
+00:01:21,626 --> 00:01:23,546
+warm water arriving around Christmas.
+
+49
+00:01:23,696 --> 00:01:24,806
+They called it El Niño,
+
+50
+00:01:24,956 --> 00:01:26,816
+the child, after the baby Jesus.
+
+51
+00:01:27,756 --> 00:01:29,576
+Scientists track El Niño by watching one
+
+52
+00:01:29,616 --> 00:01:31,326
+box of ocean in the central Pacific,
+
+53
+00:01:31,386 --> 00:01:33,026
+called Niño 3.4.
+
+54
+00:01:33,066 --> 00:01:34,346
+When it stays more than half a degree
+
+55
+00:01:34,386 --> 00:01:35,946
+warmer than usual for several months,
+
+56
+00:01:36,096 --> 00:01:37,266
+El Niño is declared.
+
+57
+00:01:37,416 --> 00:01:39,216
+This year, it's not half a degree.
+
+58
+00:01:39,366 --> 00:01:40,706
+The World Meteorological Organization
+
+59
+00:01:40,746 --> 00:01:42,266
+expects that box to average around
+
+60
+00:01:42,306 --> 00:01:44,666
+3.7 degrees warmer than normal from
+
+61
+00:01:44,706 --> 00:01:47,076
+October to December, with a peak around December.
+
+62
+00:01:47,146 --> 00:01:49,346
+It says El Niño is firmly established and
+
+63
+00:01:49,386 --> 00:01:50,556
+strengthening rapidly,
+
+64
+00:01:50,676 --> 00:01:52,736
+and gives it a near 100% chance of lasting
+
+65
+00:01:52,776 --> 00:01:54,456
+through February 2027.
+
+66
+00:01:54,606 --> 00:01:56,226
+Put it next to the giants of the past:
+
+67
+00:01:56,376 --> 00:01:59,736
+1982, 1997, 2015.
+
+68
+00:01:59,886 --> 00:02:01,146
+This one is in the same league,
+
+69
+00:02:01,296 --> 00:02:02,196
+or beyond.
+
+70
+00:02:02,926 --> 00:02:04,276
+So what happens on the ground?
+
+71
+00:02:04,426 --> 00:02:06,196
+El Niño doesn't hit everyone the same way.
+
+72
+00:02:06,346 --> 00:02:07,576
+It reshuffles the weather.
+
+73
+00:02:07,726 --> 00:02:09,276
+In Indonesia, the Philippines and
+
+74
+00:02:09,316 --> 00:02:11,356
+Australia, rain tends to disappear.
+
+75
+00:02:11,506 --> 00:02:13,416
+Drought brings crop losses and raises the
+
+76
+00:02:13,456 --> 00:02:14,986
+risk of massive wildfires.
+
+77
+00:02:15,136 --> 00:02:17,266
+Southern Africa often faces failed harvests.
+
+78
+00:02:17,416 --> 00:02:18,856
+India's monsoon can weaken.
+
+79
+00:02:19,006 --> 00:02:20,896
+In northern Brazil, the Amazon can dry out.
+
+80
+00:02:21,046 --> 00:02:23,056
+Meanwhile, other places get too much water.
+
+81
+00:02:23,206 --> 00:02:24,576
+The coasts of Peru and Ecuador can see
+
+82
+00:02:24,616 --> 00:02:26,612
+torrential rain and deadly floods in
+
+83
+00:02:26,652 --> 00:02:27,786
+normally dry deserts.
+
+84
+00:02:27,826 --> 00:02:29,586
+Southern Brazil, Uruguay and northern
+
+85
+00:02:29,626 --> 00:02:31,716
+Argentina, the southern United States,
+
+86
+00:02:31,756 --> 00:02:32,866
+parts of East Africa:
+
+87
+00:02:33,016 --> 00:02:33,976
+all tend to get wetter.
+
+88
+00:02:34,126 --> 00:02:35,296
+And almost everywhere,
+
+89
+00:02:35,356 --> 00:02:36,976
+the dice are loaded toward heat.
+
+90
+00:02:37,126 --> 00:02:38,496
+The World Meteorological Organization
+
+91
+00:02:38,536 --> 00:02:40,026
+forecasts above-average temperatures
+
+92
+00:02:40,066 --> 00:02:41,466
+across large parts of the globe through
+
+93
+00:02:41,506 --> 00:02:42,336
+the end of the year.
+
+94
+00:02:42,376 --> 00:02:44,326
+Same ocean, opposite disasters.
+
+95
+00:02:45,259 --> 00:02:46,479
+You don't have to live in these places to
+
+96
+00:02:46,519 --> 00:02:47,139
+feel it.
+
+97
+00:02:47,179 --> 00:02:48,739
+El Niño is an economic event.
+
+98
+00:02:49,039 --> 00:02:50,919
+Cocoa, coffee, palm oil,
+
+99
+00:02:50,959 --> 00:02:52,899
+rice and sugar are grown in regions it
+
+100
+00:02:52,939 --> 00:02:55,119
+hits hardest, so droughts there show up as
+
+101
+00:02:55,159 --> 00:02:56,899
+higher prices in supermarkets everywhere.
+
+102
+00:02:57,049 --> 00:02:58,839
+Off Peru, the warm water drives away the
+
+103
+00:02:58,879 --> 00:03:00,159
+anchovies that feed one of the world's
+
+104
+00:03:00,199 --> 00:03:02,349
+biggest fisheries, which affects fishmeal
+
+105
+00:03:02,389 --> 00:03:03,739
+and fish farming worldwide.
+
+106
+00:03:03,934 --> 00:03:05,769
+Past strong El Niños have cost the global
+
+107
+00:03:05,809 --> 00:03:07,419
+economy trillions of dollars over the
+
+108
+00:03:07,459 --> 00:03:08,359
+following years.
+
+109
+00:03:09,062 --> 00:03:09,962
+There's one more twist.
+
+110
+00:03:10,112 --> 00:03:12,182
+El Niño doesn't add new heat to the planet.
+
+111
+00:03:12,332 --> 00:03:14,432
+But it moves heat from the ocean into the air.
+
+112
+00:03:14,582 --> 00:03:15,952
+And this time, it arrives on top of
+
+113
+00:03:15,992 --> 00:03:17,552
+decades of global warming.
+
+114
+00:03:17,702 --> 00:03:19,612
+That's why the years following strong El
+
+115
+00:03:19,652 --> 00:03:22,112
+Niños tend to break global temperature records.
+
+116
+00:03:22,262 --> 00:03:23,552
+2016 did.
+
+117
+00:03:23,672 --> 00:03:24,902
+2024 did.
+
+118
+00:03:25,052 --> 00:03:27,932
+Many scientists expect 2027 could be next.
+
+119
+00:03:28,696 --> 00:03:30,046
+El Niño is natural.
+
+120
+00:03:30,145 --> 00:03:32,026
+It's been happening for thousands of years.
+
+121
+00:03:32,176 --> 00:03:34,276
+What's new is the world it's landing in.
+
+122
+00:03:34,426 --> 00:03:35,286
+Over the next few months,
+
+123
+00:03:35,326 --> 00:03:37,176
+a patch of ocean most people will never
+
+124
+00:03:37,216 --> 00:03:38,736
+see will shape their weather,
+
+125
+00:03:38,776 --> 00:03:40,606
+their food, and their year.
+
+126
+00:03:40,756 --> 00:03:41,746
+Now you know where to look.
+

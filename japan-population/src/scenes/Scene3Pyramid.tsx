@@ -8,7 +8,7 @@ import { useCurrentFrame } from 'remotion';
 import { BigCounter, Cutout, HandDrawnAnnotation, PopulationPyramid, SourceTag, boomIndexAt, pyramidGeometry, pyramidStateAt } from '../components';
 import type { PyramidKeyframe } from '../components';
 import { babyBooms, ipss2070, pyramids } from '../data/japan';
-import { COLORS, FONTS } from '../theme';
+import { COLORS, FONTS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { SceneShell, cue, useFade } from './helpers';
 

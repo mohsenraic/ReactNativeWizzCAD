@@ -8,7 +8,7 @@ import { useCurrentFrame } from 'remotion';
 import { AnimatedLineChart, BigCounter, HandDrawnAnnotation, SourceTag, makeChartScales, seriesTip } from '../components';
 import type { ChartProps } from '../components';
 import { lossFromPeakMillions, populationPeak, totalPopulation } from '../data/japan';
-import { COLORS, FONTS } from '../theme';
+import { COLORS, FONTS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { SceneShell, cue, useFade } from './helpers';
 

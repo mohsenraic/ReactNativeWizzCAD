@@ -10,8 +10,8 @@ import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from 're
 import { AnimatedLineChart, BigCounter, Cutout, IconCard, KineticTitle, PaperBackground, RedString, SourceTag, makeChartScales, pinOffset } from '../components';
 import type { ChartProps, IconName } from '../components';
 import { REPLACEMENT_TFR, fertilitySeries, vital2025 } from '../data/japan';
-import { tornClipPath } from '../lib/sketch';
-import { COLORS, FONTS, SPRINGS } from '../theme';
+import { tornClipPath } from '../../../shared/lib/sketch';
+import { COLORS, FONTS, SPRINGS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { Fade, SceneShell, cue } from './helpers';
 

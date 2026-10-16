@@ -9,7 +9,7 @@ import { Easing, interpolate, useCurrentFrame } from 'remotion';
 import { AnimatedLineChart, BigCounter, Cutout, HandDrawnAnnotation, KineticTitle, SourceTag, WorldMap, makeChartScales } from '../components';
 import type { ChartProps } from '../components';
 import { ipss2070, ipssProjection, sameTrajectory, totalPopulation } from '../data/japan';
-import { COLORS, FONTS } from '../theme';
+import { COLORS, FONTS } from '../../../shared/theme';
 import { END_SCREEN_FRAMES, sceneById } from '../timeline';
 import { populationChartBase } from './Scene2Peak';
 import { Fade, SceneShell, cue } from './helpers';

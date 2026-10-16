@@ -1,6 +1,6 @@
 /**
- * JapanPopulation.tsx — the full video: a <Series> of the 8 scenes, voiceover + music slots,
- * optional captions.
+ * JapanPopulation.tsx — the full video: a <Series> of the 8 scenes, voiceover + music slots.
+ * No on-screen subtitles; src/data/captions.ts is kept only as the timing source for animation cues.
  *
  * Audio files go in public/: voiceover.mp3 (fitted to the timeline by scripts/voiceover/fit_voiceover.py)
  * and music.mp3 (optional).
@@ -9,27 +9,24 @@
  */
 import React from 'react';
 import { AbsoluteFill, Audio, Series, interpolate, staticFile, useVideoConfig } from 'remotion';
-import { Captions } from './components';
 import {
   SCENE_1_DURATION, SCENE_2_DURATION, SCENE_3_DURATION, SCENE_4_DURATION, SCENE_5_DURATION, SCENE_6_DURATION,
   SCENE_7_DURATION, SCENE_8_DURATION, Scene1Hook, Scene2Peak, Scene3Pyramid, Scene4BirthsDeaths, Scene5Why,
   Scene6Consequences, Scene7Response, Scene8Outro,
 } from './scenes';
-import { COLORS } from './theme';
+import { COLORS } from '../../shared/theme';
 
 export type JapanPopulationProps = {
   voiceover: boolean;
   music: boolean;
   /** Music bed level (0–1). Kept low under the narration. */
   musicVolume: number;
-  captions: boolean;
 };
 
 export const defaultJapanPopulationProps: JapanPopulationProps = {
   voiceover: true,
   music: false,
   musicVolume: 0.08,
-  captions: false,
 };
 
 const SCENES: Array<{ name: string; duration: number; C: React.FC }> = [
@@ -45,7 +42,7 @@ const SCENES: Array<{ name: string; duration: number; C: React.FC }> = [
 
 export const TOTAL_DURATION = SCENES.reduce((s, x) => s + x.duration, 0);
 
-export const JapanPopulation: React.FC<JapanPopulationProps> = ({ voiceover, music, musicVolume, captions }) => {
+export const JapanPopulation: React.FC<JapanPopulationProps> = ({ voiceover, music, musicVolume }) => {
   const { durationInFrames } = useVideoConfig();
   return (
     <AbsoluteFill style={{ backgroundColor: COLORS.charcoal }}>
@@ -67,7 +64,6 @@ export const JapanPopulation: React.FC<JapanPopulationProps> = ({ voiceover, mus
           }
         />
       )}
-      <Captions enabled={captions} />
     </AbsoluteFill>
   );
 };

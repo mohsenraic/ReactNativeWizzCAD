@@ -6,7 +6,7 @@ import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { BigCounter, DocumentCard, HandDrawnAnnotation, SourceTag, Stamp, useStampShake } from '../components';
 import { foreignResidents, policySpending, robotics } from '../data/japan';
-import { COLORS, FONTS } from '../theme';
+import { COLORS, FONTS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { SceneShell, cue } from './helpers';
 

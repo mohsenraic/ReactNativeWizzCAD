@@ -11,7 +11,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "baseUrl": ".",
+    "paths": {
+      "@remotion/google-fonts/*": ["./node_modules/@remotion/google-fonts/dist/cjs/*"],
+      "*": ["./node_modules/@types/*", "./node_modules/*"]
+    }
   },
-  "include": ["src", "scripts"]
+  "include": ["src", "scripts", "../shared"]
 }

@@ -1,6 +1,6 @@
 # Why Japan Is Losing Millions of People — Remotion project
 
-5-minute data explainer (1920×1080, 30 fps, 9000 frames), built entirely from motion graphics.
+4:20 data explainer (1920×1080, 30 fps, 7788 frames), built entirely from motion graphics.
 
 ## Status
 
@@ -23,11 +23,11 @@ Render the video:
 
 ```bash
 npx remotion render JapanPopulation out/japan.mp4
-# with audio + subtitles burned in:
-npx remotion render JapanPopulation out/japan.mp4 --props='{"voiceover":true,"music":true,"captions":true}'
+# with the music bed (no subtitles — the video has none):
+npx remotion render JapanPopulation out/japan.mp4 --props='{"voiceover":true,"music":true}'
 ```
 
-Compositions: `JapanPopulation` (5:00), `Scene1-Hook` … `Scene8-Outro` (one per scene), `ComponentGallery`, `Demo-*`.
+Compositions: `JapanPopulation` (4:20), `Scene1-Hook` … `Scene8-Outro` (one per scene), `ComponentGallery`, `Demo-*`.
 Quick review stills: `node scripts/render-stills.mjs '[["Scene4-BirthsDeaths", 700, "s4"]]'` → `out/stills/s4.png`.
 
 ### Audio
@@ -46,7 +46,7 @@ python3 scripts/voiceover/fit_voiceover.py narration.wav path/to/vosk-model-smal
 npm run check:data
 ```
 
-It transcribes the take, aligns every word to the script, refits the scene lengths (total stays 5:00 with a 10 s
+It transcribes the take, aligns every word to the script, refits the scene lengths (lead-in + speech + 1 s tail per scene, with a 10 s
 end screen), re-times all captions — and with them every animation cue — and writes `public/voiceover.mp3`.
 Current take: 95% of script words matched; captions start within 0.7 frames of the voice on average (max 2.7).
 

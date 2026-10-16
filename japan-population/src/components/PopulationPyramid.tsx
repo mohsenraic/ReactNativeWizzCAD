@@ -19,10 +19,10 @@
  */
 import React, { useId } from 'react';
 import { Easing, interpolate, interpolateColors, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import { COLORS, FONTS, SPRINGS, Tone, toneColors } from '../theme';
+import { COLORS, FONTS, SPRINGS, Tone, toneColors } from '../../../shared/theme';
 import { boomCohortIndex, COHORT_COUNT, PyramidCohort, PyramidYear } from '../data/japan';
-import { jitter } from '../lib/sketch';
-import { formatNumber } from '../lib/format';
+import { jitter } from '../../../shared/lib/sketch';
+import { formatNumber } from '../../../shared/lib/format';
 
 export interface PyramidKeyframe {
   data: PyramidYear;

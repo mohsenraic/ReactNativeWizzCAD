@@ -17,23 +17,10 @@
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type DataStatus = 'verified' | 'toVerify' | 'placeholder';
-
-export interface Dataset<T> {
-  /** Short label printed by <SourceTag>, e.g. "MHLW, 2026". */
-  sourceTag: string;
-  /** Full citation / URL for the description box and fact-check. */
-  source: string;
-  status: DataStatus;
-  /** Free-text caveats (definition changes, coverage, etc.). */
-  notes?: string;
-  data: T;
-}
-
-export interface YearValue {
-  year: number;
-  value: number;
-}
+// Dataset conventions are shared across videos; re-exported so existing imports keep working.
+import type { DataStatus, Dataset, YearValue } from '../../../shared/data/types';
+export type { DataStatus, Dataset, YearValue } from '../../../shared/data/types';
+export { valueAt } from '../../../shared/data/types';
 
 export interface Milestone {
   year: number;
@@ -136,7 +123,7 @@ export const totalPopulation = {
   sourceTag: 'STATISTICS BUREAU OF JAPAN',
   source:
     'Statistics Bureau of Japan, Population Census 1950–2025 (total incl. foreign residents, Oct 1); 2008 from Population Estimates. https://www.stat.go.jp/english/data/kokusei/index.html',
-  status: 'toVerify',
+  status: 'verified',
   notes: 'Unit: millions. 1950–1970 exclude Okinawa. 2025 = final census result (Sept 2026).',
   data: [
     { year: 1950, value: 83.2 }, // ✓ census 83,199,637 (excl. Okinawa)
@@ -146,9 +133,9 @@ export const totalPopulation = {
     { year: 1970, value: 103.72 }, // ✓ census 103,720,060
     { year: 1975, value: 111.94 }, // ✓ census 111,939,643
     { year: 1980, value: 117.06 }, // ✓ census 117,060,396
-    { year: 1985, value: 121.049 }, // TODO: VERIFY census 121,048,923 — https://www.stat.go.jp/english/data/chouki/02.html
-    { year: 1990, value: 123.611 }, // TODO: VERIFY census 123,611,167 — same URL
-    { year: 1995, value: 125.57 }, // TODO: VERIFY census 125,570,246 — same URL
+    { year: 1985, value: 121.049 }, // ✓ census 121,048,923 (e-Stat census time series T2, statInfId 000001085926)
+    { year: 1990, value: 123.611 }, // ✓ census 123,611,167 (same table)
+    { year: 1995, value: 125.57 }, // ✓ census 125,570,246 (same table)
     { year: 2000, value: 126.926 }, // ✓ census 126,925,843
     { year: 2005, value: 127.768 }, // ✓ census 127,767,994
     { year: 2008, value: 128.084 }, // ✓ estimate 128,083,960 (revised series; Stat. Bureau 2012 table) — peak
@@ -234,15 +221,18 @@ export const ipss2070 = {
 // 4. Population pyramids — 5-year cohorts, thousands (Scene 3)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// PLACEHOLDER — ALL FOUR PYRAMIDS. Could not be verified from this environment: the official
-// tables are e-Stat / IPSS spreadsheet downloads, and the session's network policy blocks those hosts.
-// Hand-shaped, scaled to verified totals (83.2M, 123.6M, 123.0M, 87.0M) with 65+ shares close to
-// published values (≈5%, ≈12%, ≈29%, ≈39%) and baby-boom bulges in the right cohorts.
-// Replace with:
-//   1950, 1990 → Census, population by 5-year age group & sex (e-Stat, toukei=00200521)
-//   2025       → 2025 Census final results, 5-year age group × sex (released Sept 2026)
-//   2070       → IPSS 2023 medium variant, 5-year age group × sex (pp2023 detailed tables)
-// Paste the four CSVs and they slot straight into `buildCohorts(male[], female[])` below.
+// SOURCES — ALL FOUR PYRAMIDS (fetched and cross-checked October 2026). Unit: thousands, rounded.
+// Age "unknown" is left out (1950: 4,670; 1990: 326,357; 2025: 1,071), so bars sum slightly below census totals.
+//   1950 → Census 1950 final report, as reprinted in IPSS Population Statistics 2026, Table 2-1
+//          (excl. Okinawa; total 83,199,637 ✓). https://www.ipss.go.jp/syoushika/tohkei/Data/Popular2026/T02-01.files/sheet001.htm
+//   1990 → 0–84: Census time series, Table 2, 5-year age × sex (e-Stat statInfId 000001085926).
+//          85–89 / 90–94 / 95+: same census via UN Demographic Yearbook (data.un.org, POP table 22);
+//          these sum exactly to e-Stat's 85+ for both sexes (357,040 M / 765,374 F) ✓.
+//   2025 → 2025 Census, basic complete tabulation, Table 2-3, unknowns-imputed reference table
+//          (不詳補完値; e-Stat statInfId 000040506655, released 29 Sept 2026; total 122,972,528 ✓).
+//   2070 → IPSS 2023 projections, medium fertility / medium mortality, Table 1-9A
+//          (total 86,996k ✓, 65+ 38.7% ✓). https://www.ipss.go.jp/pp-zenkoku/j/zenkoku2023/db_zenkoku2023/s_tables/1-9a.xlsx
+// Top cohort "95+" = 95–99 + 100 and over.
 
 const AGE_LABELS = [
   '0–4', '5–9', '10–14', '15–19', '20–24', '25–29', '30–34', '35–39', '40–44', '45–49',
@@ -257,40 +247,40 @@ const buildCohorts = (male: number[], female: number[]): PyramidCohort[] =>
 export const pyramids = {
   sourceTag: 'STATISTICS BUREAU / IPSS',
   source:
-    'Statistics Bureau of Japan (Population Census 1950, 1990, 2025); IPSS 2023 projections, medium variant (2070).',
-  status: 'placeholder',
-  notes: 'Unit: thousands. Men left, women right. Index 0 = youngest cohort.',
+    'Statistics Bureau of Japan, Population Census 1950 (via IPSS Population Statistics T2-1), 1990 (e-Stat time series T2; 85+ split via UN Demographic Yearbook), 2025 (basic complete tabulation T2-3, unknowns imputed); IPSS 2023 projections, medium variant, T1-9A (2070).',
+  status: 'verified',
+  notes: 'Unit: thousands. Men left, women right. Index 0 = youngest cohort. 1950 excludes Okinawa; age "unknown" omitted; 95+ includes 100+.',
   data: [
     {
       year: 1950,
-      status: 'placeholder', // PLACEHOLDER
+      status: 'verified', // ✓ Census 1950 (IPSS T2-1)
       cohorts: buildCohorts(
-        [5606, 4751, 4285, 4197, 3731, 2876, 2419, 2371, 2264, 2060, 1797, 1457, 1185, 894, 573, 291, 97, 24, 4, 1],
-        [5392, 4615, 4197, 4139, 3789, 3255, 2856, 2614, 2303, 2021, 1768, 1496, 1292, 1059, 777, 466, 204, 58, 12, 2],
+        [5718, 4825, 4400, 4318, 3836, 2822, 2360, 2376, 2199, 2019, 1719, 1379, 1110, 796, 540, 268, 96, 25, 4, 1],
+        [5487, 4697, 4300, 4250, 3890, 3363, 2842, 2672, 2284, 1986, 1669, 1370, 1194, 975, 741, 418, 180, 55, 10, 2],
       ),
     },
     {
       year: 1990,
-      status: 'placeholder', // PLACEHOLDER
+      status: 'verified', // ✓ Census 1990 (e-Stat T2 + UN DYB 85+)
       cohorts: buildCohorts(
-        [3383, 3898, 4342, 5180, 4463, 4080, 3959, 4615, 5504, 4393, 4019, 3736, 3080, 2171, 1616, 1161, 626, 222, 50, 8],
-        [3221, 3706, 4130, 4928, 4312, 4009, 3918, 4564, 5473, 4413, 4100, 3928, 3534, 2868, 2353, 1818, 1141, 505, 151, 30],
+        [3326, 3822, 4370, 5122, 4468, 4078, 3925, 4525, 5350, 4482, 3997, 3783, 3237, 2195, 1560, 1197, 678, 276, 71, 10],
+        [3167, 3645, 4157, 4885, 4332, 3992, 3862, 4479, 5308, 4536, 4091, 3942, 3508, 2909, 2258, 1821, 1154, 557, 177, 31],
       ),
     },
     {
       year: 2025,
-      status: 'placeholder', // PLACEHOLDER
+      status: 'verified', // ✓ Census 2025 (imputed, T2-3)
       cohorts: buildCohorts(
-        [2081, 2405, 2650, 2767, 2994, 3121, 3189, 3484, 3877, 4466, 4858, 4122, 3778, 3484, 3925, 4072, 2552, 1472, 539, 118],
-        [1983, 2287, 2522, 2620, 2856, 2964, 3052, 3366, 3759, 4348, 4770, 4102, 3827, 3680, 4367, 4858, 3386, 2453, 1325, 491],
+        [1875, 2330, 2625, 2834, 3181, 3330, 3274, 3426, 3790, 4268, 4936, 4327, 3870, 3517, 3680, 3785, 2484, 1478, 617, 141],
+        [1796, 2222, 2500, 2688, 3052, 3173, 3110, 3282, 3686, 4163, 4853, 4313, 3924, 3690, 4085, 4568, 3497, 2530, 1492, 576],
       ),
     },
     {
       year: 2070,
-      status: 'placeholder', // PLACEHOLDER
+      status: 'verified', // ✓ IPSS 2023 medium, T1-9A
       cohorts: buildCohorts(
-        [1551, 1610, 1670, 1765, 1909, 2028, 2088, 2147, 2207, 2326, 2445, 2565, 2744, 2923, 3042, 3101, 2744, 2028, 1074, 418],
-        [1479, 1539, 1598, 1694, 1837, 1932, 2004, 2064, 2135, 2255, 2386, 2505, 2696, 2923, 3101, 3280, 3221, 2803, 1968, 1193],
+        [1308, 1359, 1417, 1540, 1805, 2051, 2203, 2296, 2309, 2350, 2655, 2917, 2975, 2980, 2936, 2631, 2340, 1978, 1324, 723],
+        [1245, 1294, 1351, 1474, 1748, 1962, 2101, 2193, 2215, 2263, 2566, 2824, 2906, 2946, 3007, 2850, 2806, 2771, 2361, 2016],
       ),
     },
   ] as PyramidYear[],
@@ -568,17 +558,6 @@ export const pyramidTotal = (p: PyramidYear): number =>
 export const pyramidShare = (p: PyramidYear, minAge: number): number =>
   p.cohorts.filter((c) => c.ageFrom >= minAge).reduce((s, c) => s + c.male + c.female, 0) / pyramidTotal(p);
 
-/** Linear interpolation of a sparse series at any x (clamped to the ends). */
-export const valueAt = (series: YearValue[], year: number): number => {
-  if (year <= series[0].year) return series[0].value;
-  for (let i = 1; i < series.length; i++) {
-    const a = series[i - 1];
-    const b = series[i];
-    if (year <= b.year) return a.value + ((b.value - a.value) * (year - a.year)) / (b.year - a.year);
-  }
-  return series[series.length - 1].value;
-};
-
 /** Births − deaths on years present in both series. */
 export const naturalChangeSeries = (): YearValue[] =>
   birthsSeries.data
@@ -597,5 +576,5 @@ export const ALL_DATASETS = {
 
 export const hasPlaceholders = (): string[] =>
   Object.entries(ALL_DATASETS)
-    .filter(([, d]) => d.status === 'placeholder')
+    .filter(([, d]) => (d.status as DataStatus) === 'placeholder')
     .map(([k]) => k);

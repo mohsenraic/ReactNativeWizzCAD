@@ -9,8 +9,8 @@ import React from 'react';
 import { Easing, interpolate, random, useCurrentFrame } from 'remotion';
 import { BigCounter, Cutout, DocumentCard, HandDrawnAnnotation, JapanMap, LoopDiagram, SourceTag, Stamp } from '../components';
 import { akiya, mapFocus, workersPerRetiree } from '../data/japan';
-import { formatNumber } from '../lib/format';
-import { COLORS, FONTS } from '../theme';
+import { formatNumber } from '../../../shared/lib/format';
+import { COLORS, FONTS } from '../../../shared/theme';
 import { sceneById } from '../timeline';
 import { Fade, SceneShell, cue } from './helpers';
 

@@ -8,7 +8,7 @@
 import React from 'react';
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 import { captionAt } from '../data/captions';
-import { FONTS } from '../theme';
+import { FONTS } from '../../../shared/theme';
 
 export const Captions: React.FC<{ enabled?: boolean; bottom?: number; fontSize?: number }> = ({ enabled = true, bottom = 120, fontSize = 40 }) => {
   const frame = useCurrentFrame();

@@ -1,0 +1,45 @@
+/**
+ * Shared component library — import from here in every video.
+ *   import { Cutout, BigCounter } from '../../shared/components';
+ */
+export { AnimatedLineChart, drawSpan, makeChartScales, revealX, seriesTip } from './AnimatedLineChart';
+export type { ChartArea, ChartMarker, ChartMilestone, ChartProps, ChartScales, ChartSeries } from './AnimatedLineChart';
+export { BigCounter, useCountValue } from './BigCounter';
+export { WorldMap, worldProjection } from './WorldMap';
+export type { WorldDot } from './WorldMap';
+export { IconCard, pinOffset, ICON_CARD_WIDTH } from './IconCard';
+export { AnimatedIcon } from './icons';
+export type { IconName } from './icons';
+export { Stamp, useStampShake } from './Stamp';
+export { LoopDiagram } from './LoopDiagram';
+export { KineticTitle } from './KineticTitle';
+export { PaperBackground } from './PaperBackground';
+export type { PaperVariant } from './PaperBackground';
+export { CameraRig, ParallaxLayer, useCamera } from './CameraRig';
+export type { CameraMove } from './CameraRig';
+export { Highlighter } from './Highlighter';
+export { HandDrawnAnnotation } from './HandDrawnAnnotation';
+export type { AnnotationShape, AnnotationLabel } from './HandDrawnAnnotation';
+export { Cutout, useEnter } from './Cutout';
+export type { EnterFrom } from './Cutout';
+export { DocumentCard } from './DocumentCard';
+export type { DocumentVariant, Paragraph, Segment } from './DocumentCard';
+export { ChapterCard } from './ChapterCard';
+export { SourceTag } from './SourceTag';
+export { RedString } from './RedString';
+export { SceneTransition } from './SceneTransition';
+export type { TransitionType } from './SceneTransition';
+export type { MapApi, MapBounds, MapRegion, RegionFill } from './WorldMap';
+export { WeatherIcon } from './weatherIcons';
+export type { WeatherIconName } from './weatherIcons';
+export { SceneShell } from './SceneShell';
+export { EndCard } from './EndCard';
+export { Fade, useFade } from '../lib/fade';
+export { PhotoCutout, usePhotoReady } from './PhotoCutout';
+export type { KenBurnsKey, PhotoTreatment } from './PhotoCutout';
+export { AnimatedBarChart, barChartScales } from './AnimatedBarChart';
+export type { Bar, BarChartProps, BarChartScales } from './AnimatedBarChart';
+export { WaffleChart } from './WaffleChart';
+export type { WaffleCategory } from './WaffleChart';
+export { RouteMap, RouteLayer, routeGeometry, pointAlong } from './RouteMap';
+export type { Route, RouteMarker, RouteNode } from './RouteMap';

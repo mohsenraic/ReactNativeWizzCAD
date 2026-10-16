@@ -1,5 +1,5 @@
 /**
- * Root.tsx — JapanPopulation (the 5:00 video) plus the component gallery and one composition per
+ * Root.tsx — JapanPopulation (the ~4:20 video) plus the component gallery and one composition per
  * scene for quick previews.
  */
 import React from 'react';
