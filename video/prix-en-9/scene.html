@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cash en Bref – Prix en 9</title>
+<style>
+  @font-face { font-family: IB;  src: url('file:///usr/share/fonts/opentype/inter/Inter-Black.otf'); }
+  @font-face { font-family: IXB; src: url('file:///usr/share/fonts/opentype/inter/Inter-ExtraBold.otf'); }
+  @font-face { font-family: ISB; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  html, body { margin: 0; background: #0B3B2E; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="logo.js"></script>
+<script>
+/* =====================================================================
+   Cash en Bref — "Plus cher = plus vendu ?" (prix finissant par 9) — 50 s, 9:16
+   Every frame is a pure function of time: window.frame(t) -> JPEG.
+   Safe zone: y 230 (top 12 %) → y 1536 (bottom 20 %).
+   ===================================================================== */
+const W = 1080, H = 1920, FPS = 30, DURATION = 51;
+const G = '#0B3B2E', L = '#C8F031', O = '#F4F1EA';
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+
+/* ---------- captions (edit text here; [word, isLime]) ---------- */
+const CAP = {
+  s1:  [[['PLUS', 0], ['CHER', 1]], [['=', 0], ['PLUS', 0], ['VENDU', 1], ['?', 1]]],
+  s2:  [[['UNE', 0], ['MÊME', 0], ['ROBE', 0]], [['3', 1], ['PRIX', 1]]],
+  s3:  [[['44 $', 1], ['≈', 0], ['54 $', 1]], [['MÊMES', 0], ['VENTES', 0]]],
+  s4:  [[['49 $', 1]], [['GAGNE', 0], ['!', 0]]],
+  s5:  [[['9', 1], ['=', 0]], [['«', 0], ['BONNE', 1], ['AFFAIRE', 1], ['»', 0]]],
+  s6:  [[['TESTÉ', 0], ['SUR', 0]], [['DES', 0], ['CATALOGUES', 1]]],
+  s7a: [[["C'EST", 0], ['PAREIL…', 1]], [['OU', 0], ['PRESQUE', 0]]],
+  s7:  [[['ENVOIE', 0], ['ÇA', 0]], [['À', 0], ['UN', 1], ['AMI', 1]]],
+};
+
+/* ---------- math / easing ---------- */
+const PI = Math.PI, TAU = PI * 2;
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const p = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const ei = x => x * x * x;
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eback = x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const ebounce = x => {
+  const n1 = 7.5625, d1 = 2.75;
+  if (x < 1 / d1) return n1 * x * x;
+  if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + .75;
+  if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + .9375;
+  return n1 * (x -= 2.625 / d1) * x + .984375;
+};
+const wobble = (t, t0, amp = 1, f = 14, d = 5) => t < t0 ? 0 : amp * Math.sin((t - t0) * f) * Math.exp(-(t - t0) * d);
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- color ---------- */
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+function mix(a, b, k, alpha = 1) {
+  const A = hex(a), B = hex(b);
+  return `rgba(${A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(',')},${alpha})`;
+}
+const rgba = (h, a) => mix(h, h, 0, a);
+const GD = mix(G, '#000000', .38);       // deep green (same hue)
+const GL = mix(G, O, .07);               // lifted green
+
+/* ---------- drawing helpers ---------- */
+function circ(x, y, r) { ctx.beginPath(); ctx.arc(x, y, Math.max(r, .01), 0, TAU); }
+function ell(x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, Math.max(Math.abs(rx), .01), Math.max(Math.abs(ry), .01), 0, 0, TAU); }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function txt(s, x, y, size, color, fam = 'IB', align = 'center') {
+  ctx.font = `${size}px ${fam}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y);
+}
+function sh(blur = 34, oy = 16, a = .38) { ctx.shadowColor = `rgba(2,16,12,${a})`; ctx.shadowBlur = blur; ctx.shadowOffsetY = oy; ctx.shadowOffsetX = 0; }
+function glow(color, blur) { ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.shadowOffsetY = 0; ctx.shadowOffsetX = 0; }
+function nosh() { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; }
+function group(x, y, s, rot, alpha, fn) {
+  if (alpha <= 0.001 || s <= 0.001) return;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot || 0); ctx.scale(s, s); ctx.globalAlpha *= alpha; fn(); ctx.restore();
+}
+function line(x1, y1, x2, y2, w, c, cap = 'round') { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineWidth = w; ctx.strokeStyle = c; ctx.lineCap = cap; ctx.stroke(); }
+function bez(P, t) { // cubic bezier point + tangent angle
+  const [a, b, c, d] = P, u = 1 - t;
+  const x = u*u*u*a[0] + 3*u*u*t*b[0] + 3*u*t*t*c[0] + t*t*t*d[0];
+  const y = u*u*u*a[1] + 3*u*u*t*b[1] + 3*u*t*t*c[1] + t*t*t*d[1];
+  const dx = 3*u*u*(b[0]-a[0]) + 6*u*t*(c[0]-b[0]) + 3*t*t*(d[0]-c[0]);
+  const dy = 3*u*u*(b[1]-a[1]) + 6*u*t*(c[1]-b[1]) + 3*t*t*(d[1]-c[1]);
+  return [x, y, Math.atan2(dy, dx)];
+}
+function dashedPath(P, upto, color, w = 7, dash = [4, 22]) {
+  ctx.save(); ctx.beginPath();
+  const N = 80;
+  for (let i = 0; i <= N * upto; i++) { const [x, y] = bez(P, i / N); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.setLineDash(dash); ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.strokeStyle = color; ctx.stroke(); ctx.restore();
+}
+function star4(x, y, r, rot, color) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.beginPath();
+  for (let i = 0; i < 8; i++) { const a = i * PI / 4, rad = i % 2 ? r * .28 : r; ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); }
+  ctx.closePath(); ctx.fillStyle = color; ctx.fill(); ctx.restore();
+}
+
+/* ---------- money props ---------- */
+function coin(x, y, r, rot = 0, squash = 1) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(squash, 1);
+  circ(0, 0, r); ctx.fillStyle = L; ctx.fill();
+  circ(0, 0, r * .78); ctx.lineWidth = r * .09; ctx.strokeStyle = mix(L, G, .32); ctx.stroke();
+  txt('€', 0, r * .05, r * 1.0, mix(L, G, .75));
+  ctx.restore();
+}
+function coinStack(x, y, n, rx) {
+  for (let i = 0; i < n; i++) {
+    const yy = y - i * rx * .26;
+    ctx.fillStyle = mix(L, G, .38); ell(x, yy + rx * .1, rx, rx * .3); ctx.fill();
+    ctx.fillStyle = L; ell(x, yy, rx, rx * .3); ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = mix(L, G, .3); ell(x, yy, rx * .72, rx * .2); ctx.stroke();
+  }
+}
+function bundle(x, y, w, h, rot = 0) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  rr(-w / 2, -h / 2, w, h, 7); ctx.fillStyle = O; ctx.fill();
+  ctx.strokeStyle = mix(O, G, .22); ctx.lineWidth = 2;
+  for (let i = 1; i < 5; i++) line(-w / 2 + 8, -h / 2 + i * h / 5, w / 2 - 8, -h / 2 + i * h / 5, 2, mix(O, G, .2), 'butt');
+  ctx.fillStyle = L; ctx.fillRect(-w * .11, -h / 2 - 3, w * .22, h + 6);
+  ctx.restore();
+}
+function note(x, y, w, h, rot = 0) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  rr(-w / 2, -h / 2, w, h, 8); ctx.fillStyle = O; ctx.fill();
+  rr(-w / 2 + 9, -h / 2 + 9, w - 18, h - 18, 5); ctx.lineWidth = 3; ctx.strokeStyle = mix(O, G, .3); ctx.stroke();
+  circ(0, 0, h * .27); ctx.fillStyle = L; ctx.fill();
+  txt('€', 0, 2, h * .36, G);
+  ctx.restore();
+}
+
+/* ---------- kinetic captions ---------- */
+function caption(t, a, b, lines, y, size = 112, maxW = 940) {
+  if (t < a || t > b + .01) return;
+  ctx.save();
+  ctx.font = `${size}px IB`;
+  const space = size * .27;
+  let widest = 0;
+  const meas = lines.map(l => { const ws = l.map(w => ctx.measureText(w[0]).width); const tot = ws.reduce((s, v) => s + v, 0) + space * (l.length - 1); widest = Math.max(widest, tot); return { ws, tot }; });
+  const fit = Math.min(1, maxW / widest), sz = size * fit, sp = space * fit, lh = sz * 1.06;
+  const total = lines.reduce((s, l) => s + l.length, 0);
+  let idx = 0;
+  lines.forEach((l, li) => {
+    let x = W / 2 - meas[li].tot * fit / 2;
+    const yy = y + li * lh;
+    l.forEach((w, wi) => {
+      const ww = meas[li].ws[wi] * fit;
+      const st = a + .075 * idx;
+      const k = p(t, st, st + .38);
+      const out = p(t, b - .26 + .03 * (total - 1 - idx) * .5, b);
+      const s = eback(k) * (1 - eio(out));
+      const al = clamp(k * 3) * (1 - out);
+      if (s > .001) {
+        ctx.save(); ctx.translate(x + ww / 2, yy + (1 - eo(k)) * 40 - out * 30); ctx.scale(s, s);
+        ctx.globalAlpha = al; sh(22, 10, .45);
+        txt(w[0], 0, 0, sz, w[1] ? L : O);
+        ctx.restore();
+      }
+      x += ww + sp; idx++;
+    });
+  });
+  ctx.restore();
+}
+
+/* ---------- background & texture ---------- */
+const grain = [];
+function makeGrain() {
+  for (let g = 0; g < 4; g++) {
+    const c = document.createElement('canvas'); c.width = 540; c.height = 960;
+    const x = c.getContext('2d'), id = x.createImageData(540, 960), r = rng(91 + g);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const v = r(); const light = v > .5;
+      id.data[i] = light ? 244 : 0; id.data[i + 1] = light ? 241 : 10; id.data[i + 2] = light ? 234 : 6;
+      id.data[i + 3] = Math.floor(Math.pow(Math.abs(v - .5) * 2, 2.2) * 70);
+    }
+    x.putImageData(id, 0, 0);
+    // paper fibres
+    for (let k = 0; k < 220; k++) {
+      x.strokeStyle = r() > .5 ? 'rgba(244,241,234,0.05)' : 'rgba(0,0,0,0.06)'; x.lineWidth = .7;
+      const sx = r() * 540, sy = r() * 960, a = r() * TAU, l = 6 + r() * 16;
+      x.beginPath(); x.moveTo(sx, sy); x.quadraticCurveTo(sx + Math.cos(a) * l * .5 + 3, sy + Math.sin(a) * l * .5, sx + Math.cos(a) * l, sy + Math.sin(a) * l); x.stroke();
+    }
+    grain.push(c);
+  }
+}
+function bg() {
+  ctx.fillStyle = G; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(540, 900, 80, 540, 980, 1250);
+  g.addColorStop(0, 'rgba(244,241,234,0.06)'); g.addColorStop(.55, 'rgba(244,241,234,0)'); g.addColorStop(1, 'rgba(0,8,5,0.42)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+function overlay(T) {
+  ctx.save();
+  ctx.globalAlpha = .55; ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(grain[Math.floor(T * 4) % 4], 0, 0, W, H);
+  ctx.restore();
+}
+
+
+function puff(t, t0, x, y, w) {
+  const k = p(t, t0, t0 + .7); if (k <= 0 || k >= 1) return;
+  for (let i = 0; i < 9; i++) {
+    const dir = (i / 8 - .5) * 2, r = rng(i * 13 + Math.round(x))();
+    circ(x + dir * w * (.4 + eo(k) * .5), y - eo(k) * (20 + r * 40), (10 + r * 14) * (1 - k * .4));
+    ctx.fillStyle = rgba(O, .35 * (1 - k)); ctx.fill();
+  }
+}
+/* =====================================================================
+   shared props
+   ===================================================================== */
+function tag(w, h, label, fill, ink, size = .42) {
+  // price tag pointing left, origin at centre
+  sh(24, 12, .45);
+  ctx.beginPath();
+  ctx.moveTo(-w / 2, 0); ctx.lineTo(-w / 2 + h * .45, -h / 2); ctx.lineTo(w / 2 - 14, -h / 2); ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + 14);
+  ctx.lineTo(w / 2, h / 2 - 14); ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - 14, h / 2); ctx.lineTo(-w / 2 + h * .45, h / 2); ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill(); nosh();
+  circ(-w / 2 + h * .32, 0, h * .09); ctx.fillStyle = G; ctx.fill();
+  if (label) txt(label, h * .2, h * .03, h * size, ink, 'IB');
+}
+function dress(s = 1, col = G, belt = L) {
+  ctx.save(); ctx.scale(s, s);
+  ctx.beginPath();
+  ctx.moveTo(-34, -150); ctx.quadraticCurveTo(-46, -120, -60, -112); ctx.lineTo(-44, -40);          // left strap/bodice
+  ctx.lineTo(-110, 130); ctx.quadraticCurveTo(0, 156, 110, 130);                                    // skirt
+  ctx.lineTo(44, -40); ctx.lineTo(60, -112); ctx.quadraticCurveTo(46, -120, 34, -150);
+  ctx.quadraticCurveTo(0, -112, -34, -150); ctx.closePath();
+  ctx.fillStyle = col; ctx.fill();
+  ctx.fillStyle = belt; ctx.fillRect(-46, -44, 92, 16);
+  ctx.strokeStyle = rgba(O, .25); ctx.lineWidth = 3;
+  for (let i = -1; i <= 1; i++) { ctx.beginPath(); ctx.moveTo(i * 22, -24); ctx.lineTo(i * 52, 128); ctx.stroke(); }
+  ctx.restore();
+}
+function catalogue(w = 900, h = 700) {
+  sh(40, 22, .5); rr(-w / 2, -h / 2, w, h, 18); ctx.fillStyle = mix(O, G, .06); ctx.fill(); nosh();
+  ctx.fillStyle = O; ctx.fillRect(-w / 2 + 10, -h / 2 + 10, w / 2 - 14, h - 20); ctx.fillRect(4, -h / 2 + 10, w / 2 - 14, h - 20);
+  const g = ctx.createLinearGradient(-30, 0, 30, 0); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.5, 'rgba(0,20,12,.18)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(-30, -h / 2 + 10, 60, h - 20);
+  txt('CATALOGUE', -w / 4, -h / 2 + 46, 26, mix(O, G, .5), 'IB'); txt('AUTOMNE', w / 4, -h / 2 + 46, 26, mix(O, G, .5), 'IB');
+}
+function bigArrow(len, col = L) {
+  ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(-18, -len + 40); ctx.lineTo(-44, -len + 40); ctx.lineTo(0, -len); ctx.lineTo(44, -len + 40); ctx.lineTo(18, -len + 40); ctx.lineTo(18, 0); ctx.closePath();
+  ctx.fillStyle = col; ctx.fill();
+}
+
+/* =====================================================================
+   SCENE 1 (0–3 s) — 44 $ flips to 49 $, the sales arrow goes UP
+   ===================================================================== */
+function S1(t) {
+  bg();
+  // swinging tag on a string
+  const sin_ = eo(p(t, 0, .45));
+  const sw = (1 - sin_) * -1.1 + .22 * Math.sin(t * 5) * Math.exp(-t * 1.2);
+  const flip = p(t, .95, 1.3), fy = Math.cos(flip * PI);
+  ctx.save(); ctx.translate(290, 600); ctx.rotate(sw); ctx.scale(1.4, 1.4);
+  line(0, 0, 0, 250, 5, O); circ(0, 0, 10); ctx.fillStyle = O; ctx.fill();
+  ctx.translate(96, 250);                          // tag hole sits at the end of the string
+  ctx.scale(1, Math.max(.02, Math.abs(fy)));
+  if (flip < .5) tag(300, 170, '44 $', O, G, .5); else tag(300, 170, '49 $', L, G, .5);
+  ctx.restore();
+  // up arrow next to the tag
+  const ak = eback(p(t, 1.3, 1.6));
+  group(760, 960, ak * 1.2, 0, 1, () => { glow(rgba(L, .5), 20); bigArrow(170); });
+  // sales chart: arrow shoots up with a "boing"
+  const ck = eback(p(t, 1.45, 1.75));
+  group(770, 1400, ck * 1.1, 0, 1, () => {
+    line(-170, 0, 170, 0, 8, O); line(-170, 0, -170, -260, 8, O);
+    const k = p(t, 1.75, 2.15), b = wobble(t, 2.15, .18, 22, 5);
+    const pts = [[-150, -60], [-90, -90], [-30, -70]];
+    const endX = lerp(-30, 140, eo(k)), endY = lerp(-70, -250, eback(k)) * (1 + b);
+    ctx.beginPath(); ctx.moveTo(...pts[0]); ctx.lineTo(...pts[1]); ctx.lineTo(...pts[2]); ctx.lineTo(endX, endY);
+    ctx.lineWidth = 14; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = L; ctx.stroke();
+    const a = Math.atan2(endY + 70, endX + 30);
+    ctx.save(); ctx.translate(endX, endY); ctx.rotate(a); ctx.beginPath(); ctx.moveTo(28, 0); ctx.lineTo(-18, -24); ctx.lineTo(-18, 24); ctx.closePath(); ctx.fillStyle = L; ctx.fill(); ctx.restore();
+    txt('VENTES', 0, 44, 30, rgba(O, .7), 'IB');
+  });
+  caption(t, .9, 3.15, CAP.s1, 380, 116);
+}
+
+/* =====================================================================
+   SCENE 2 (3–10 s) — one dress, three prices, a magnifying glass
+   ===================================================================== */
+const PRICES = ['44 $', '49 $', '54 $'], PX = [255, 540, 825];
+function S2(t) {
+  bg();
+  const bk = eo(p(t, .1, .6));
+  group(540, 1060 + (1 - bk) * 900, 1, -.02 * (1 - bk), 1, () => catalogue());
+  PX.forEach((x, i) => {
+    const dk = eback(p(t, .55 + i * .2, .9 + i * .2));
+    group(x, 1010, dk, 0, 1, () => dress(.95));
+    const tk = eback(p(t, 1.1 + i * .3, 1.45 + i * .3));
+    group(x, 1250, tk, -.06 + wobble(t, 1.45 + i * .3, .15, 18, 5), 1, () => tag(210, 90, PRICES[i], i === 1 ? L : O, G, .5));
+  });
+  // magnifying glass sweeps across
+  const mk = p(t, 2.1, 6.4);
+  if (mk > 0 && mk < 1) {
+    const x = lerp(120, 960, eio(mk)), y = 1080 + Math.sin(mk * TAU * 1.5) * 50;
+    ctx.save(); circ(x, y, 90); ctx.fillStyle = rgba(O, .14); ctx.fill();
+    sh(20, 10, .4); circ(x, y, 90); ctx.lineWidth = 18; ctx.strokeStyle = O; ctx.stroke(); nosh();
+    line(x + 66, y + 66, x + 150, y + 150, 30, O); line(x - 40, y - 46, x - 10, y - 62, 8, rgba(O, .7));
+    ctx.restore();
+  }
+  caption(t, .15, 7.15, CAP.s2, 380, 112);
+}
+
+/* =====================================================================
+   SCENES 3 & 4 — sales bars under each price
+   ===================================================================== */
+const BASE = 1460, H44 = 350, H54 = 340, H49 = 490;     // 49 $ ≈ +40 % over the others (pilot: 66 vs 46/45 units)
+function chart(t3, t4) {
+  // t3: time in scene 3 (or its end), t4: time in scene 4 (or -1)
+  PX.forEach((x, i) => {
+    group(x, 680, 1, 0, 1, () => { dress(.5, O); });
+    group(x, 785, 1, -.05, 1, () => tag(190, 80, PRICES[i], i === 1 && t4 >= 0 ? L : O, G, .5));
+  });
+  line(90, BASE, 990, BASE, 6, rgba(O, .5));
+  const grow = eo(p(t3, .5, 2.4));
+  const h = [H44 * grow, Math.min(H44 * .92, H44 * eo(p(t3, .5, 2.8))) , H54 * grow];
+  if (t4 >= 0) h[1] = lerp(H44 * .92, H49, eio(p(t4, .3, 2.2)));
+  PX.forEach((x, i) => {
+    const hl = i === 1 && t4 >= 0;
+    ctx.save();
+    if (hl) glow(rgba(L, .7 * p(t4, .3, 1)), 50); else sh(20, 10, .4);
+    rr(x - 80, BASE - h[i], 160, h[i], [16, 16, 0, 0]); ctx.fillStyle = hl ? L : O; ctx.fill();
+    ctx.restore();
+  });
+  // ≈ between 44 $ and 54 $
+  const ak = p(t3, 2.5, 3.0);
+  if (ak > 0) {
+    const y = BASE - H44 - 60;
+    ctx.save(); ctx.globalAlpha = t4 >= 0 ? 1 - p(t4, .2, .7) : 1;
+    ctx.beginPath(); ctx.moveTo(PX[0], BASE - H44 - 20); ctx.quadraticCurveTo(540, y - 170, PX[2], BASE - H54 - 20);
+    ctx.setLineDash([4, 18]); ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.strokeStyle = rgba(O, .7 * eo(ak)); ctx.stroke(); ctx.setLineDash([]);
+    group(540, y - 90, eback(ak), 0, 1, () => { sh(16, 8, .4); circ(0, 0, 56); ctx.fillStyle = O; ctx.fill(); nosh(); txt('≈', 0, 2, 80, G, 'IB'); });
+    ctx.restore();
+  }
+}
+function S3(t) {
+  bg();
+  chart(t, -1);
+  caption(t, .15, 7.15, CAP.s3, 380, 112);
+}
+function S4(t) {
+  bg();
+  chart(9, t);
+  // trophy
+  const tk = eback(p(t, 2.3, 2.7));
+  group(540, BASE - H49 - 75, tk, wobble(t, 2.7, .2, 16, 5), 1, () => {
+    sh(16, 8, .45);
+    ctx.beginPath(); ctx.moveTo(-50, -60); ctx.lineTo(50, -60); ctx.quadraticCurveTo(50, 20, 0, 24); ctx.quadraticCurveTo(-50, 20, -50, -60); ctx.closePath(); ctx.fillStyle = O; ctx.fill(); nosh();
+    ctx.lineWidth = 10; ctx.strokeStyle = O; ctx.beginPath(); ctx.arc(-50, -30, 22, PI / 2, PI * 1.5); ctx.stroke(); ctx.beginPath(); ctx.arc(50, -30, 22, -PI / 2, PI / 2); ctx.stroke();
+    ctx.fillStyle = O; ctx.fillRect(-10, 24, 20, 30); rr(-40, 52, 80, 18, 6); ctx.fill();
+    star4(0, -22, 20, 0, L);
+  });
+  const sp = p(t, 2.6, 3.6);
+  if (sp > 0 && sp < 1) for (let i = 0; i < 8; i++) { const a = i / 8 * TAU; star4(540 + Math.cos(a) * (90 + sp * 90), BASE - H49 - 75 + Math.sin(a) * (80 + sp * 80), 16 * Math.sin(sp * PI), sp * 3, i % 2 ? O : L); }
+  caption(t, .15, 6.15, CAP.s4, 380, 120);
+}
+
+/* =====================================================================
+   SCENE 5 (23–32 s) — the brain reads a 9 as "PROMO"
+   ===================================================================== */
+function brainPath() {
+  ctx.beginPath();
+  ctx.moveTo(-230, 40);
+  ctx.bezierCurveTo(-290, -10, -270, -130, -190, -150);
+  ctx.bezierCurveTo(-170, -230, -60, -250, -10, -200);
+  ctx.bezierCurveTo(40, -260, 170, -240, 190, -160);
+  ctx.bezierCurveTo(290, -140, 300, -10, 240, 30);
+  ctx.bezierCurveTo(270, 110, 180, 170, 110, 130);
+  ctx.bezierCurveTo(80, 190, -10, 190, -40, 140);
+  ctx.bezierCurveTo(-110, 190, -230, 150, -230, 40);
+  ctx.closePath();
+}
+function brain(light) {
+  ctx.save();
+  if (light > 0) glow(rgba(L, .8 * light), 70 * light);
+  brainPath(); ctx.fillStyle = light > 0 ? rgba(L, .18 * light) : rgba(O, .04); ctx.fill();
+  ctx.restore();
+  brainPath(); ctx.lineWidth = 12; ctx.lineJoin = 'round'; ctx.strokeStyle = O; ctx.stroke();
+  const fold = light > 0 ? mix(O, L, light) : O;
+  ctx.strokeStyle = fold; ctx.lineWidth = 8; ctx.lineCap = 'round';
+  const folds = [[[-170, -60], [-120, -110], [-60, -80]], [[-20, -150], [20, -100], [80, -140]], [[110, -60], [170, -20], [140, 40]], [[-150, 60], [-90, 20], [-30, 70]], [[20, 40], [70, 0], [100, 80]]];
+  for (const [a, b, c] of folds) { ctx.beginPath(); ctx.moveTo(...a); ctx.quadraticCurveTo(...b, ...c); ctx.stroke(); }
+  // cerebellum + stem
+  ctx.beginPath(); ctx.arc(150, 150, 60, -.4, PI * .9); ctx.lineWidth = 12; ctx.strokeStyle = O; ctx.stroke();
+  line(70, 160, 60, 260, 26, O);
+}
+function sticker(label) {
+  ctx.beginPath();
+  for (let i = 0; i < 32; i++) { const a = i / 32 * TAU, r = i % 2 ? 128 : 150; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+  ctx.closePath(); sh(24, 12, .45); ctx.fillStyle = L; ctx.fill(); nosh();
+  circ(0, 0, 112); ctx.lineWidth = 5; ctx.strokeStyle = rgba(G, .35); ctx.stroke();
+  txt(label, 0, 4, 60, G, 'IB');
+}
+function S5(t) {
+  bg();
+  const bk = eback(p(t, .1, .55));
+  const light = eo(p(t, 2.3, 2.8));
+  group(540, 1060, bk, 0, 1, () => brain(light));
+  // the 9 floats in
+  const fk = p(t, .6, 2.2), morph = p(t, 2.8, 3.3);
+  if (fk > 0 && morph < 1) {
+    const x = lerp(-120, 520, eio(fk)) + Math.sin(fk * 9) * 20 * (1 - fk), y = lerp(760, 1000, eio(fk)) + Math.sin(fk * 6) * 40 * (1 - fk);
+    group(x, y, (1 - eio(morph)) * (1 + .1 * Math.sin(t * 6)), Math.sin(t * 3) * .15 * (1 - fk) + morph * 2, 1, () => { sh(20, 10, .45); txt('9', 0, 0, 240, O); });
+  }
+  if (morph > 0) {
+    const s = eback(morph);
+    group(520, 1000, s, -.12 + wobble(t, 3.3, .2, 14, 4), 1, () => sticker('PROMO'));
+    const sp = p(t, 3.2, 4.2);
+    if (sp > 0 && sp < 1) for (let i = 0; i < 10; i++) { const a = i / 10 * TAU; star4(520 + Math.cos(a) * (180 + sp * 120), 1000 + Math.sin(a) * (180 + sp * 120), 20 * Math.sin(sp * PI), sp * 4, i % 2 ? O : L); }
+  }
+  caption(t, .3, 9.15, CAP.s5, 380, 112);
+}
+
+/* =====================================================================
+   SCENE 6 (32–39 s) — catalogues tested, sales up to +30 %
+   ===================================================================== */
+function bag() { rr(-90, -60, 180, 140, 18); ctx.fillStyle = G; ctx.fill(); ctx.beginPath(); ctx.arc(0, -60, 56, PI, 0); ctx.lineWidth = 14; ctx.strokeStyle = G; ctx.stroke(); ctx.fillStyle = L; ctx.fillRect(-90, -10, 180, 16); }
+function shoe() { ctx.beginPath(); ctx.moveTo(-110, 40); ctx.lineTo(-110, -40); ctx.quadraticCurveTo(-80, -60, -50, -30); ctx.quadraticCurveTo(20, 10, 100, 10); ctx.quadraticCurveTo(130, 20, 120, 40); ctx.closePath(); ctx.fillStyle = G; ctx.fill(); ctx.fillStyle = L; ctx.fillRect(-110, 36, 230, 12); }
+const PAGES = [{ fn: () => dress(.9), price: '39 $' }, { fn: bag, price: '49 $' }, { fn: shoe, price: '59 $' }];
+function S6(t) {
+  bg();
+  const finale = eo(p(t, 4.0, 4.5));
+  PAGES.forEach((pg, i) => {
+    const st = .2 + i * 1.25, inK = eo(p(t, st, st + .45)), outK = i < 2 ? ei(p(t, st + 1.25, st + 1.6)) : 0;
+    if (inK <= 0 || outK >= 1) return;
+    const x = lerp(1400, 540, inK) - outK * 1000;
+    group(x + i * 12, 1050 - i * 6, 1, (i - 1) * .04, 1 - finale * .75, () => {
+      sh(36, 20, .5); rr(-270, -380, 540, 720, 18); ctx.fillStyle = O; ctx.fill(); nosh();
+      txt('CATALOGUE', 0, -330, 26, mix(O, G, .5), 'IB');
+      group(0, -90, 1, 0, 1, pg.fn);
+      group(40, 110, 1, -.05, 1, () => tag(200, 84, pg.price, L, G, .5));
+      // sales counter jumping up
+      rr(-200, 200, 400, 110, 20); ctx.fillStyle = mix(O, G, .1); ctx.fill();
+      txt('VENTES', -110, 255, 30, G, 'IB');
+      const ck = p(t, st + .45, st + 1.2);
+      for (let b = 0; b < 5; b++) { const hh = (24 + b * 12) * eback(clamp(ck * 5 - b)); rr(10 + b * 34, 290 - hh, 24, hh, 4); ctx.fillStyle = b === 4 ? L : G; ctx.fill(); }
+      group(185, 245, eback(p(t, st + 1.0, st + 1.25)), 0, 1, () => { ctx.save(); ctx.scale(.3, .3); bigArrow(160); ctx.restore(); });
+    });
+  });
+  if (finale > 0) {
+    const s = eback(p(t, 4.0, 4.45)) * (1 + .03 * Math.sin(t * 5));
+    group(540, 1000, s, -.04, 1, () => { glow(rgba(L, .6), 50); txt('+30 %', 0, 0, 230, L); });
+    group(540, 820, eo(p(t, 4.2, 4.6)), 0, 1, () => txt("JUSQU'À", 0, 0, 64, O, 'IB'));
+    group(540, 1170, eo(p(t, 4.4, 4.8)), 0, 1, () => txt('de ventes avec un prix en 9', 0, 0, 44, rgba(O, .85), 'IXB'));
+  }
+  caption(t, .15, 7.15, CAP.s6, 380, 112);
+}
+
+/* =====================================================================
+   SCENE 7 part 1 — 9,99 € melts into 10 €
+   ===================================================================== */
+function S7melt(t) {
+  const out = eio(p(t, 3.0, 3.4));
+  const tk = eback(p(t, .1, .45));
+  const roll = eio(p(t, 1.1, 1.7));
+  const melt = p(t, .8, 1.8);
+  const shift = eio(p(t, 1.9, 2.4));
+  // ghost "9,99 €" on the left once the tag has changed
+  group(250, 1020, eback(p(t, 1.95, 2.35)) * (1 - out), -.06, 1 - out, () => tag(320, 140, '9,99 €', O, G, .4));
+  group(540 + shift * 250, 1020 - out * 400, tk * (1 - shift * .25) * (1 - out), .06 * Math.sin(t * 7) * (1 - roll) + wobble(t, 1.8, .12, 16, 5), 1 - out, () => {
+    tag(420, 180, null, L, G);
+    ctx.save(); ctx.font = '96px IB'; ctx.textBaseline = 'middle';
+    const x0 = 180 * .2 - 150;
+    // integer part rolls 9 -> 10
+    ctx.save(); ctx.beginPath(); ctx.rect(x0 - 10, -60, 150, 120); ctx.clip();
+    ctx.fillStyle = G; ctx.textAlign = 'left';
+    ctx.fillText('9', x0 + 30 * roll, 4 - roll * 110); ctx.fillText('10', x0, 4 + (1 - roll) * 110);
+    ctx.restore();
+    // decimals melt and drip away
+    if (melt < 1) {
+      ctx.save(); ctx.globalAlpha = 1 - ei(melt); ctx.translate(x0 + 70, 4 + ei(melt) * 120); ctx.scale(1 - melt * .2, 1 + melt * 1.4);
+      ctx.fillStyle = G; ctx.textAlign = 'left'; ctx.fillText(',99', 0, 0); ctx.restore();
+      for (let d = 0; d < 3; d++) { const dk = clamp(melt * 1.6 - d * .25); if (dk <= 0 || dk >= 1) continue; ctx.beginPath(); const dx = x0 + 100 + d * 34, dy = 40 + ei(dk) * 200; ctx.ellipse(dx, dy, 9, 15, 0, 0, TAU); ctx.fillStyle = rgba(G, 1 - dk); ctx.fill(); }
+    }
+    ctx.fillStyle = G; ctx.textAlign = 'left'; ctx.fillText('€', lerp(x0 + 222, x0 + 150, roll), 4);
+    ctx.restore();
+  });
+  group(520, 1020, eback(p(t, 2.3, 2.65)) * (1 - out), 0, 1 - out, () => { sh(14, 8, .4); circ(0, 0, 48); ctx.fillStyle = L; ctx.fill(); nosh(); txt('=', 0, 2, 72, G, 'IB'); });
+  caption(t, .2, 3.3, CAP.s7a, 380, 112);
+}
+
+function phone(drawScreen, w = 500, h = 900) {
+  sh(50, 26, .55); rr(-w / 2, -h / 2, w, h, 70); ctx.fillStyle = O; ctx.fill(); nosh();
+  rr(-w / 2 + 18, -h / 2 + 18, w - 36, h - 36, 54); ctx.fillStyle = GL; ctx.fill();
+  ctx.save(); rr(-w / 2 + 18, -h / 2 + 18, w - 36, h - 36, 54); ctx.clip(); drawScreen(); ctx.restore();
+  rr(-60, -h / 2 + 36, 120, 30, 15); ctx.fillStyle = O; ctx.fill();
+  rr(-70, h / 2 - 44, 140, 8, 4); ctx.fillStyle = rgba(O, .5); ctx.fill();
+}
+function check(x, y, r, k, col) { // k: draw progress
+  ctx.beginPath(); const pts = [[-.45, .02], [-.12, .34], [.48, -.3]]; const segs = k * 2;
+  ctx.moveTo(x + pts[0][0] * r, y + pts[0][1] * r);
+  for (let i = 1; i < 3; i++) { const sk = clamp(segs - (i - 1)); if (sk <= 0) break; ctx.lineTo(x + lerp(pts[i - 1][0], pts[i][0], sk) * r, y + lerp(pts[i - 1][1], pts[i][1], sk) * r); }
+  ctx.lineWidth = r * .2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = col; ctx.stroke();
+}
+/* =====================================================================
+   SCENE 7 part 2 — share + Cash en Bref logo + "Abonne-toi"
+   ===================================================================== */
+function plane(x, y, a, s) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.scale(s, s);
+  sh(18, 10, .4);
+  ctx.beginPath(); ctx.moveTo(70, 0); ctx.lineTo(-60, -46); ctx.lineTo(-30, 0); ctx.lineTo(-60, 46); ctx.closePath(); ctx.fillStyle = O; ctx.fill(); nosh();
+  ctx.beginPath(); ctx.moveTo(70, 0); ctx.lineTo(-30, 0); ctx.lineTo(-40, 26); ctx.closePath(); ctx.fillStyle = mix(O, G, .25); ctx.fill();
+  ctx.restore();
+}
+const LOGO = new Image(); LOGO.src = window.LOGO_SRC;
+function S7cta(t) {
+  bg();
+  // phone + share
+  const outP = eio(p(t, 2.6, 3.1));
+  if (outP < 1) {
+    const pin = eback(p(t, 0, .45));
+    group(540, 1180 + outP * 1100, .62 * pin, 0, 1, () => phone(() => {
+      txt('Partager', 0, -300, 46, rgba(O, .7), 'IB');
+      for (let i = 0; i < 6; i++) { const x = -130 + (i % 3) * 130, y = -120 + Math.floor(i / 3) * 170; circ(x, y, 50); ctx.fillStyle = rgba(O, .12); ctx.fill(); }
+      circ(0, 300, 70); ctx.fillStyle = L; ctx.fill();
+      ctx.save(); ctx.translate(0, 300); ctx.rotate(-.5); ctx.beginPath(); ctx.moveTo(34, 0); ctx.lineTo(-28, -22); ctx.lineTo(-14, 0); ctx.lineTo(-28, 22); ctx.closePath(); ctx.fillStyle = G; ctx.fill(); ctx.restore();
+    }));
+  }
+  const PP = [[540, 1000], [180, 860], [430, 420], [1220, 280]];
+  const pk = eio(p(t, .55, 2.45));
+  if (pk > 0 && pk < 1) {
+    dashedPath(PP, pk, rgba(O, .5), 6, [2, 20]);
+    const [x, y, a] = bez(PP, pk);
+    plane(x, y, a, .7 + Math.sin(pk * PI) * .6);
+  }
+  caption(t, .2, 2.85, CAP.s7, 400, 118);
+
+  // logo assembly
+  if (t > 2.9) {
+    // Cash en Bref badge
+    const ring = eio(p(t, 3.2, 3.75)), disc = eback(p(t, 3.0, 3.5)), R = 250;
+    const bob = Math.sin((t - 4) * 1.6) * 8 * clamp(t - 4);
+    ctx.save(); ctx.translate(540, 840 + bob);
+    ctx.beginPath(); ctx.arc(0, 0, R + 22, -PI / 2, -PI / 2 + TAU * ring); ctx.lineWidth = 8; ctx.strokeStyle = O; ctx.lineCap = 'round'; ctx.stroke();
+    group(0, 0, disc, (1 - eo(p(t, 3.0, 3.5))) * -.5, 1, () => {
+      glow(rgba(L, .35), 60); circ(0, 0, R); ctx.fillStyle = GD; ctx.fill(); nosh();
+      ctx.drawImage(LOGO, -R, -R, 2 * R, 2 * R);
+      const shine = p(t, 3.85, 4.5);
+      if (shine > 0 && shine < 1) { ctx.save(); circ(0, 0, R); ctx.clip(); ctx.translate(lerp(-2 * R, 2 * R, shine), 0); ctx.rotate(.5); ctx.fillStyle = rgba(O, .35); ctx.fillRect(-26, -2 * R, 52, 4 * R); ctx.restore(); }
+    });
+    ctx.restore();
+    // coin sparks bursting from the badge
+    const bs = p(t, 3.35, 4.2);
+    if (bs > 0 && bs < 1) for (let i = 0; i < 10; i++) { const a = i / 10 * TAU, d = R + 30 + eo(bs) * 120; star4(540 + Math.cos(a) * d, 840 + Math.sin(a) * d, 22 * Math.sin(bs * PI), bs * 3, i % 2 ? O : L); }
+    const tg = eo(p(t, 4.35, 4.85));
+    ctx.globalAlpha = tg; txt("L'argent expliqué simplement", 540, 1175 + (1 - tg) * 24, 46, rgba(O, .88), 'IXB'); ctx.globalAlpha = 1;
+
+    // subscribe button + cursor
+    const bk = eback(p(t, 5.1, 5.5));
+    const click = 6.75, press = t > click ? 1 - .1 * Math.sin(p(t, click, click + .22) * PI) : 1;
+    const ripple = p(t, click, click + .7);
+    if (ripple > 0 && ripple < 1) { ctx.save(); rr(-235 - ripple * 80 + 540, 1340 - 58 - ripple * 40, 470 + ripple * 160, 116 + ripple * 80, 80); ctx.lineWidth = 8 * (1 - ripple); ctx.strokeStyle = rgba(L, 1 - ripple); ctx.stroke(); ctx.restore(); }
+    const done = t > click + .15;
+    group(540, 1340, bk * press * (1 + .03 * Math.sin(t * 5) * clamp(t - 5.5) * (done ? 0 : 1)), 0, 1, () => {
+      sh(26, 14, .5); rr(-235, -58, 470, 116, 58); ctx.fillStyle = done ? O : L; ctx.fill(); nosh();
+      if (done) { check(-118, 0, 46, eo(p(t, click + .15, click + .45)), G); txt('Abonné', 30, 2, 52, G, 'IB'); }
+      else { circ(-162, 0, 26); ctx.fillStyle = G; ctx.fill(); ctx.beginPath(); ctx.moveTo(-170, -12); ctx.lineTo(-150, 0); ctx.lineTo(-170, 12); ctx.closePath(); ctx.fillStyle = L; ctx.fill(); txt('Abonne-toi', 30, 2, 52, G, 'IB'); }
+    });
+    if (done) for (let i = 0; i < 6; i++) { const k = p(t, click + .15, click + .9), a = -PI / 2 + (i - 2.5) * .45; if (k > 0 && k < 1) star4(540 + Math.cos(a) * (240 + k * 80), 1340 + Math.sin(a) * (90 + k * 90), 18 * Math.sin(k * PI), k * 4, i % 2 ? O : L); }
+    const ck = eio(p(t, 5.9, 6.65));
+    if (t > 5.8) {
+      const cx = lerp(880, 610, ck), cy = lerp(1560, 1362, ck), cs = t > click && t < click + .2 ? .85 : 1;
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(cs, cs); ctx.rotate(-.12); sh(14, 8, .5);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 74); ctx.lineTo(18, 58); ctx.lineTo(32, 88); ctx.lineTo(46, 81); ctx.lineTo(32, 52); ctx.lineTo(56, 52); ctx.closePath();
+      ctx.fillStyle = O; ctx.fill(); nosh(); ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.strokeStyle = G; ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+/* =====================================================================
+   timeline + transitions
+   ===================================================================== */
+// [start, end, scene, designed length]. To sync to a voice-over, move CUTS into its pauses;
+// each scene's animation (designed at DESIGN seconds) is time-scaled to fit its slot.
+// scene 7 = the 9,99 € → 10 € tag (3.4 s) then the share / logo end card (designed at 9 s, played in 7.6 s)
+function S7(t) {
+  if (t < 3.45) { bg(); S7melt(t); }
+  if (t > 3.3) { ctx.save(); ctx.globalAlpha = p(t, 3.3, 3.45); S7cta(Math.max(0, t - 3.4) * 9 / 7.6); ctx.restore(); }
+}
+const CUTS = [0, 3.8, 9.5, 16.15, 22.9, 31.75, 38.6, 51];
+const DESIGN = [3, 7, 7, 6, 9, 7, 11];
+const SC = [S1, S2, S3, S4, S5, S6, S7].map((fn, i) => [CUTS[i], CUTS[i + 1], fn, DESIGN[i]]);
+const TR_IN = .2, TR_OUT = .22;
+function drawScene(i, T) { const [a, b, fn, d] = SC[i]; ctx.save(); fn(Math.max(0, T - a) * d / (b - a)); ctx.restore(); }
+function render(T) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; nosh();
+  let i = SC.findIndex(s => T >= s[0] && T < s[1]); if (i < 0) i = SC.length - 1;
+  // which boundary are we near?
+  let b = -1;
+  for (let j = 1; j < SC.length; j++) if (T >= SC[j][0] - TR_IN && T < SC[j][0] + TR_OUT) b = j;
+  if (b < 0) { drawScene(i, T); }
+  else {
+    const x = eio(p(T, SC[b][0] - TR_IN, SC[b][0] + TR_OUT));
+    const e = lerp(-420, W + 560, x), slant = 260, band = 150;
+    drawScene(b - 1, T);
+    ctx.save(); ctx.beginPath(); ctx.moveTo(-600, 0); ctx.lineTo(e - band + slant, 0); ctx.lineTo(e - band - slant, H); ctx.lineTo(-600, H); ctx.closePath(); ctx.clip();
+    drawScene(b, T); ctx.restore();
+    ctx.beginPath(); ctx.moveTo(e - band + slant, 0); ctx.lineTo(e + slant, 0); ctx.lineTo(e - slant, H); ctx.lineTo(e - band - slant, H); ctx.closePath(); ctx.fillStyle = L; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(e + slant + 14, 0); ctx.lineTo(e + slant + 30, 0); ctx.lineTo(e - slant + 30, H); ctx.lineTo(e - slant + 14, H); ctx.closePath(); ctx.fillStyle = O; ctx.fill();
+  }
+  // gentle fade-out on the very last frames
+  if (T > DURATION - .35) { ctx.fillStyle = `rgba(11,59,46,${p(T, DURATION - .35, DURATION) * .6})`; ctx.fillRect(0, 0, W, H); }
+  overlay(T);
+  if (window.SHOW_SAFE) { ctx.fillStyle = 'rgba(255,0,0,.25)'; ctx.fillRect(0, 0, W, H * .12); ctx.fillRect(0, H * .8, W, H * .2); }
+}
+
+window.frame = (T, type = 'image/jpeg', q = .93) => { render(T); return cv.toDataURL(type, q); };
+window.ready = (async () => {
+  await Promise.all(['IB', 'IXB', 'ISB'].map(f => document.fonts.load(`40px ${f}`)));
+  await LOGO.decode();
+  makeGrain(); render(0); return true;
+})();
+// live preview when opened in a browser: ?play
+if (location.search.includes('play')) window.ready.then(() => { const t0 = performance.now(); const loop = () => { render(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); });
+</script>
+</body>
+</html>
