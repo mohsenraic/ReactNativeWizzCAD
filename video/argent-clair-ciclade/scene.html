@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Argent Clair – Ciclade</title>
+<title>Cash en Bref – Ciclade</title>
 <style>
   @font-face { font-family: IB;  src: url('file:///usr/share/fonts/opentype/inter/Inter-Black.otf'); }
   @font-face { font-family: IXB; src: url('file:///usr/share/fonts/opentype/inter/Inter-ExtraBold.otf'); }
@@ -13,9 +13,10 @@
 </head>
 <body>
 <canvas id="c" width="1080" height="1920"></canvas>
+<script src="logo.js"></script>
 <script>
 /* =====================================================================
-   Argent Clair — "De l'argent à ton nom ?" (Ciclade) — 48 s, 9:16
+   Cash en Bref — "De l'argent à ton nom ?" (Ciclade) — 48 s, 9:16
    Every frame is a pure function of time: window.frame(t) -> JPEG.
    Safe zone: y 230 (top 12 %) → y 1536 (bottom 20 %).
    ===================================================================== */
@@ -714,7 +715,7 @@ function S6(t) {
 }
 
 /* =====================================================================
-   SCENE 7 (39–48 s) — share + Argent Clair logo + "Abonne-toi"
+   SCENE 7 (39–48 s) — share + Cash en Bref logo + "Abonne-toi"
    ===================================================================== */
 function plane(x, y, a, s) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.scale(s, s);
@@ -723,7 +724,7 @@ function plane(x, y, a, s) {
   ctx.beginPath(); ctx.moveTo(70, 0); ctx.lineTo(-30, 0); ctx.lineTo(-40, 26); ctx.closePath(); ctx.fillStyle = mix(O, G, .25); ctx.fill();
   ctx.restore();
 }
-const LOGO_WORD = [...'ARGENT CLAIR'];
+const LOGO = new Image(); LOGO.src = window.LOGO_SRC;
 function S7(t) {
   bg();
   // phone + share
@@ -748,46 +749,34 @@ function S7(t) {
 
   // logo assembly
   if (t > 2.9) {
-    const ring = eio(p(t, 3.15, 3.7)), disc = eback(p(t, 3.0, 3.4));
-    ctx.save(); ctx.translate(540, 800); ctx.rotate(Math.sin(t * 1.2) * .03 * clamp(t - 5));
-    ctx.beginPath(); ctx.arc(0, 0, 150, -PI / 2, -PI / 2 + TAU * ring); ctx.lineWidth = 8; ctx.strokeStyle = O; ctx.lineCap = 'round'; ctx.stroke();
-    group(0, 0, disc, 0, 1, () => {
-      glow(rgba(L, .45), 50); circ(0, 0, 118); ctx.fillStyle = L; ctx.fill(); nosh();
-      const a1 = eo(p(t, 3.35, 3.6)), a2 = eo(p(t, 3.5, 3.75)), a3 = eo(p(t, 3.68, 3.9));
-      line(-46, 58, lerp(-46, 0, a1), lerp(58, -62, a1), 26, G);
-      if (a2 > 0) line(0, -62, lerp(0, 46, a2), lerp(-62, 58, a2), 26, G);
-      if (a3 > 0) line(-26, 16, lerp(-26, 26, a3), 16, 22, G);
-      const shine = p(t, 3.9, 4.5);
-      if (shine > 0 && shine < 1) { ctx.save(); circ(0, 0, 118); ctx.clip(); ctx.translate(lerp(-220, 220, shine), 0); ctx.rotate(.5); ctx.fillStyle = rgba(O, .55); ctx.fillRect(-14, -200, 28, 400); ctx.restore(); }
+    // Cash en Bref badge
+    const ring = eio(p(t, 3.2, 3.75)), disc = eback(p(t, 3.0, 3.5)), R = 250;
+    const bob = Math.sin((t - 4) * 1.6) * 8 * clamp(t - 4);
+    ctx.save(); ctx.translate(540, 840 + bob);
+    ctx.beginPath(); ctx.arc(0, 0, R + 22, -PI / 2, -PI / 2 + TAU * ring); ctx.lineWidth = 8; ctx.strokeStyle = O; ctx.lineCap = 'round'; ctx.stroke();
+    group(0, 0, disc, (1 - eo(p(t, 3.0, 3.5))) * -.5, 1, () => {
+      glow(rgba(L, .35), 60); circ(0, 0, R); ctx.fillStyle = GD; ctx.fill(); nosh();
+      ctx.drawImage(LOGO, -R, -R, 2 * R, 2 * R);
+      const shine = p(t, 3.85, 4.5);
+      if (shine > 0 && shine < 1) { ctx.save(); circ(0, 0, R); ctx.clip(); ctx.translate(lerp(-2 * R, 2 * R, shine), 0); ctx.rotate(.5); ctx.fillStyle = rgba(O, .35); ctx.fillRect(-26, -2 * R, 52, 4 * R); ctx.restore(); }
     });
     ctx.restore();
-    // wordmark
-    ctx.font = '104px IB';
-    const ws = LOGO_WORD.map(c => c === ' ' ? 30 : ctx.measureText(c).width);
-    const tot = ws.reduce((a, b) => a + b, 0) + 4 * (ws.length - 1);
-    let x = 540 - tot / 2;
-    LOGO_WORD.forEach((c, i) => {
-      const st = 3.55 + i * .045, k = p(t, st, st + .5), r = rng(500 + i);
-      if (c !== ' ' && k > 0) {
-        const e = eback(k), dx = (r() - .5) * 700, dy = (r() - .5) * 600 + 200;
-        ctx.save(); ctx.translate(x + ws[i] / 2 + dx * (1 - eo(k)), 1060 + dy * (1 - eo(k))); ctx.rotate((r() - .5) * 2 * (1 - eo(k))); ctx.scale(e, e);
-        sh(18, 8, .4); txt(c, 0, 0, 104, i < 6 ? O : L); ctx.restore();
-      }
-      x += ws[i] + 4;
-    });
+    // coin sparks bursting from the badge
+    const bs = p(t, 3.35, 4.2);
+    if (bs > 0 && bs < 1) for (let i = 0; i < 10; i++) { const a = i / 10 * TAU, d = R + 30 + eo(bs) * 120; star4(540 + Math.cos(a) * d, 840 + Math.sin(a) * d, 22 * Math.sin(bs * PI), bs * 3, i % 2 ? O : L); }
     const tg = eo(p(t, 4.35, 4.85));
-    ctx.globalAlpha = tg; txt("L'argent expliqué simplement", 540, 1160 + (1 - tg) * 24, 46, rgba(O, .88), 'IXB'); ctx.globalAlpha = 1;
+    ctx.globalAlpha = tg; txt("L'argent expliqué simplement", 540, 1175 + (1 - tg) * 24, 46, rgba(O, .88), 'IXB'); ctx.globalAlpha = 1;
 
     // subscribe button + cursor
     const bk = eback(p(t, 5.1, 5.5));
     const click = 6.75, press = t > click ? 1 - .1 * Math.sin(p(t, click, click + .22) * PI) : 1;
     const ripple = p(t, click, click + .7);
-    if (ripple > 0 && ripple < 1) { ctx.save(); rr(-210 - ripple * 80 + 540, 1340 - 58 - ripple * 40, 420 + ripple * 160, 116 + ripple * 80, 80); ctx.lineWidth = 8 * (1 - ripple); ctx.strokeStyle = rgba(L, 1 - ripple); ctx.stroke(); ctx.restore(); }
+    if (ripple > 0 && ripple < 1) { ctx.save(); rr(-235 - ripple * 80 + 540, 1340 - 58 - ripple * 40, 470 + ripple * 160, 116 + ripple * 80, 80); ctx.lineWidth = 8 * (1 - ripple); ctx.strokeStyle = rgba(L, 1 - ripple); ctx.stroke(); ctx.restore(); }
     const done = t > click + .15;
     group(540, 1340, bk * press * (1 + .03 * Math.sin(t * 5) * clamp(t - 5.5) * (done ? 0 : 1)), 0, 1, () => {
-      sh(26, 14, .5); rr(-210, -58, 420, 116, 58); ctx.fillStyle = done ? O : L; ctx.fill(); nosh();
+      sh(26, 14, .5); rr(-235, -58, 470, 116, 58); ctx.fillStyle = done ? O : L; ctx.fill(); nosh();
       if (done) { check(-118, 0, 46, eo(p(t, click + .15, click + .45)), G); txt('Abonné', 30, 2, 52, G, 'IB'); }
-      else { circ(-130, 0, 26); ctx.fillStyle = G; ctx.fill(); ctx.beginPath(); ctx.moveTo(-138, -12); ctx.lineTo(-118, 0); ctx.lineTo(-138, 12); ctx.closePath(); ctx.fillStyle = L; ctx.fill(); txt('Abonne-toi', 26, 2, 52, G, 'IB'); }
+      else { circ(-162, 0, 26); ctx.fillStyle = G; ctx.fill(); ctx.beginPath(); ctx.moveTo(-170, -12); ctx.lineTo(-150, 0); ctx.lineTo(-170, 12); ctx.closePath(); ctx.fillStyle = L; ctx.fill(); txt('Abonne-toi', 30, 2, 52, G, 'IB'); }
     });
     if (done) for (let i = 0; i < 6; i++) { const k = p(t, click + .15, click + .9), a = -PI / 2 + (i - 2.5) * .45; if (k > 0 && k < 1) star4(540 + Math.cos(a) * (240 + k * 80), 1340 + Math.sin(a) * (90 + k * 90), 18 * Math.sin(k * PI), k * 4, i % 2 ? O : L); }
     const ck = eio(p(t, 5.9, 6.65));
@@ -836,6 +825,7 @@ function render(T) {
 window.frame = (T, type = 'image/jpeg', q = .93) => { render(T); return cv.toDataURL(type, q); };
 window.ready = (async () => {
   await Promise.all(['IB', 'IXB', 'ISB'].map(f => document.fonts.load(`40px ${f}`)));
+  await LOGO.decode();
   makeGrain(); render(0); return true;
 })();
 // live preview when opened in a browser: ?play

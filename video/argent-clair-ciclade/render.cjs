@@ -32,7 +32,7 @@ const stillsArg = args.includes('--stills') ? args[args.indexOf('--stills') + 1]
   }
 
   const audio = path.join(out, 'mix.wav');
-  const target = path.join(out, 'argent-clair-ciclade.mp4');
+  const target = path.join(out, 'cash-en-bref-ciclade.mp4');
   const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error',
     '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
     '-i', audio,
