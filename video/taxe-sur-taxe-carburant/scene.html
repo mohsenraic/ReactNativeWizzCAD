@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cash en Bref – Taxe sur taxe</title>
+<style>
+  @font-face { font-family: IB;  src: url('file:///usr/share/fonts/opentype/inter/Inter-Black.otf'); }
+  @font-face { font-family: IXB; src: url('file:///usr/share/fonts/opentype/inter/Inter-ExtraBold.otf'); }
+  @font-face { font-family: ISB; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  html, body { margin: 0; background: #0B3B2E; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="logo.js"></script>
+<script>
+/* =====================================================================
+   Cash en Bref — "Une taxe sur une taxe ?" (TVA sur l'accise carburant) — 48 s, 9:16
+   Every frame is a pure function of time: window.frame(t) -> JPEG.
+   Safe zone: y 230 (top 12 %) → y 1536 (bottom 20 %).
+   ===================================================================== */
+const W = 1080, H = 1920, FPS = 30, DURATION = 48;
+const G = '#0B3B2E', L = '#C8F031', O = '#F4F1EA';
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+
+/* ---------- captions (edit text here; [word, isLime]) ---------- */
+const CAP = {
+  s1:  [[['UNE', 0], ['TAXE', 1]], [['SUR', 0], ['UNE', 0], ['TAXE', 1], ['?', 1]]],
+  s2:  [[["L'ACCISE", 0]], [['0,61 €', 1], ['/ LITRE', 0]]],
+  s3a: [[['TVA', 1], ['20 %', 1]], [['SUR', 0], ['LE', 0], ['GAZOLE', 0]]],
+  s3b: [[['…ET', 0], ['SUR', 0], ['LA', 0]], [['TAXE', 1], ['!', 1]]],
+  s4a: [[['UN', 0], ['PLEIN', 0]], [['DE', 0], ['50 L', 1]]],
+  s4b: [[['DE', 0], ['TVA…', 1]], [['SUR', 0], ['UNE', 0], ['TAXE', 1]]],
+  s5a: [[['TON', 0], ['PLEIN', 0]], [['DE', 0], ['GAZOLE', 1]]],
+  s5b: [[['42 %', 1], ['DE', 0]], [['TAXES', 1]]],
+  s6:  [[['1', 0], ['PLEIN', 0], ['/', 0], ['SEMAINE', 0]], [['TVA', 1], ['SUR', 0], ['TAXE', 1]]],
+  s7:  [[['ENVOIE', 0], ['ÇA', 0]], [['À', 0], ['UN', 1], ['AMI', 1]]],
+};
+
+/* ---------- math / easing ---------- */
+const PI = Math.PI, TAU = PI * 2;
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const p = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const ei = x => x * x * x;
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eback = x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const ebounce = x => {
+  const n1 = 7.5625, d1 = 2.75;
+  if (x < 1 / d1) return n1 * x * x;
+  if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + .75;
+  if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + .9375;
+  return n1 * (x -= 2.625 / d1) * x + .984375;
+};
+const wobble = (t, t0, amp = 1, f = 14, d = 5) => t < t0 ? 0 : amp * Math.sin((t - t0) * f) * Math.exp(-(t - t0) * d);
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- color ---------- */
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+function mix(a, b, k, alpha = 1) {
+  const A = hex(a), B = hex(b);
+  return `rgba(${A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(',')},${alpha})`;
+}
+const rgba = (h, a) => mix(h, h, 0, a);
+const GD = mix(G, '#000000', .38);       // deep green (same hue)
+const GL = mix(G, O, .07);               // lifted green
+
+/* ---------- drawing helpers ---------- */
+function circ(x, y, r) { ctx.beginPath(); ctx.arc(x, y, Math.max(r, .01), 0, TAU); }
+function ell(x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, Math.max(Math.abs(rx), .01), Math.max(Math.abs(ry), .01), 0, 0, TAU); }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function txt(s, x, y, size, color, fam = 'IB', align = 'center') {
+  ctx.font = `${size}px ${fam}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y);
+}
+function sh(blur = 34, oy = 16, a = .38) { ctx.shadowColor = `rgba(2,16,12,${a})`; ctx.shadowBlur = blur; ctx.shadowOffsetY = oy; ctx.shadowOffsetX = 0; }
+function glow(color, blur) { ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.shadowOffsetY = 0; ctx.shadowOffsetX = 0; }
+function nosh() { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; }
+function group(x, y, s, rot, alpha, fn) {
+  if (alpha <= 0.001 || s <= 0.001) return;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot || 0); ctx.scale(s, s); ctx.globalAlpha *= alpha; fn(); ctx.restore();
+}
+function line(x1, y1, x2, y2, w, c, cap = 'round') { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineWidth = w; ctx.strokeStyle = c; ctx.lineCap = cap; ctx.stroke(); }
+function bez(P, t) { // cubic bezier point + tangent angle
+  const [a, b, c, d] = P, u = 1 - t;
+  const x = u*u*u*a[0] + 3*u*u*t*b[0] + 3*u*t*t*c[0] + t*t*t*d[0];
+  const y = u*u*u*a[1] + 3*u*u*t*b[1] + 3*u*t*t*c[1] + t*t*t*d[1];
+  const dx = 3*u*u*(b[0]-a[0]) + 6*u*t*(c[0]-b[0]) + 3*t*t*(d[0]-c[0]);
+  const dy = 3*u*u*(b[1]-a[1]) + 6*u*t*(c[1]-b[1]) + 3*t*t*(d[1]-c[1]);
+  return [x, y, Math.atan2(dy, dx)];
+}
+function dashedPath(P, upto, color, w = 7, dash = [4, 22]) {
+  ctx.save(); ctx.beginPath();
+  const N = 80;
+  for (let i = 0; i <= N * upto; i++) { const [x, y] = bez(P, i / N); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.setLineDash(dash); ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.strokeStyle = color; ctx.stroke(); ctx.restore();
+}
+function star4(x, y, r, rot, color) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.beginPath();
+  for (let i = 0; i < 8; i++) { const a = i * PI / 4, rad = i % 2 ? r * .28 : r; ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); }
+  ctx.closePath(); ctx.fillStyle = color; ctx.fill(); ctx.restore();
+}
+
+/* ---------- money props ---------- */
+function coin(x, y, r, rot = 0, squash = 1) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(squash, 1);
+  circ(0, 0, r); ctx.fillStyle = L; ctx.fill();
+  circ(0, 0, r * .78); ctx.lineWidth = r * .09; ctx.strokeStyle = mix(L, G, .32); ctx.stroke();
+  txt('€', 0, r * .05, r * 1.0, mix(L, G, .75));
+  ctx.restore();
+}
+function coinStack(x, y, n, rx) {
+  for (let i = 0; i < n; i++) {
+    const yy = y - i * rx * .26;
+    ctx.fillStyle = mix(L, G, .38); ell(x, yy + rx * .1, rx, rx * .3); ctx.fill();
+    ctx.fillStyle = L; ell(x, yy, rx, rx * .3); ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = mix(L, G, .3); ell(x, yy, rx * .72, rx * .2); ctx.stroke();
+  }
+}
+function bundle(x, y, w, h, rot = 0) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  rr(-w / 2, -h / 2, w, h, 7); ctx.fillStyle = O; ctx.fill();
+  ctx.strokeStyle = mix(O, G, .22); ctx.lineWidth = 2;
+  for (let i = 1; i < 5; i++) line(-w / 2 + 8, -h / 2 + i * h / 5, w / 2 - 8, -h / 2 + i * h / 5, 2, mix(O, G, .2), 'butt');
+  ctx.fillStyle = L; ctx.fillRect(-w * .11, -h / 2 - 3, w * .22, h + 6);
+  ctx.restore();
+}
+function note(x, y, w, h, rot = 0) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  rr(-w / 2, -h / 2, w, h, 8); ctx.fillStyle = O; ctx.fill();
+  rr(-w / 2 + 9, -h / 2 + 9, w - 18, h - 18, 5); ctx.lineWidth = 3; ctx.strokeStyle = mix(O, G, .3); ctx.stroke();
+  circ(0, 0, h * .27); ctx.fillStyle = L; ctx.fill();
+  txt('€', 0, 2, h * .36, G);
+  ctx.restore();
+}
+
+/* ---------- kinetic captions ---------- */
+function caption(t, a, b, lines, y, size = 112, maxW = 940) {
+  if (t < a || t > b + .01) return;
+  ctx.save();
+  ctx.font = `${size}px IB`;
+  const space = size * .27;
+  let widest = 0;
+  const meas = lines.map(l => { const ws = l.map(w => ctx.measureText(w[0]).width); const tot = ws.reduce((s, v) => s + v, 0) + space * (l.length - 1); widest = Math.max(widest, tot); return { ws, tot }; });
+  const fit = Math.min(1, maxW / widest), sz = size * fit, sp = space * fit, lh = sz * 1.06;
+  const total = lines.reduce((s, l) => s + l.length, 0);
+  let idx = 0;
+  lines.forEach((l, li) => {
+    let x = W / 2 - meas[li].tot * fit / 2;
+    const yy = y + li * lh;
+    l.forEach((w, wi) => {
+      const ww = meas[li].ws[wi] * fit;
+      const st = a + .075 * idx;
+      const k = p(t, st, st + .38);
+      const out = p(t, b - .26 + .03 * (total - 1 - idx) * .5, b);
+      const s = eback(k) * (1 - eio(out));
+      const al = clamp(k * 3) * (1 - out);
+      if (s > .001) {
+        ctx.save(); ctx.translate(x + ww / 2, yy + (1 - eo(k)) * 40 - out * 30); ctx.scale(s, s);
+        ctx.globalAlpha = al; sh(22, 10, .45);
+        txt(w[0], 0, 0, sz, w[1] ? L : O);
+        ctx.restore();
+      }
+      x += ww + sp; idx++;
+    });
+  });
+  ctx.restore();
+}
+
+/* ---------- background & texture ---------- */
+const grain = [];
+function makeGrain() {
+  for (let g = 0; g < 4; g++) {
+    const c = document.createElement('canvas'); c.width = 540; c.height = 960;
+    const x = c.getContext('2d'), id = x.createImageData(540, 960), r = rng(91 + g);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const v = r(); const light = v > .5;
+      id.data[i] = light ? 244 : 0; id.data[i + 1] = light ? 241 : 10; id.data[i + 2] = light ? 234 : 6;
+      id.data[i + 3] = Math.floor(Math.pow(Math.abs(v - .5) * 2, 2.2) * 70);
+    }
+    x.putImageData(id, 0, 0);
+    // paper fibres
+    for (let k = 0; k < 220; k++) {
+      x.strokeStyle = r() > .5 ? 'rgba(244,241,234,0.05)' : 'rgba(0,0,0,0.06)'; x.lineWidth = .7;
+      const sx = r() * 540, sy = r() * 960, a = r() * TAU, l = 6 + r() * 16;
+      x.beginPath(); x.moveTo(sx, sy); x.quadraticCurveTo(sx + Math.cos(a) * l * .5 + 3, sy + Math.sin(a) * l * .5, sx + Math.cos(a) * l, sy + Math.sin(a) * l); x.stroke();
+    }
+    grain.push(c);
+  }
+}
+function bg() {
+  ctx.fillStyle = G; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(540, 900, 80, 540, 980, 1250);
+  g.addColorStop(0, 'rgba(244,241,234,0.06)'); g.addColorStop(.55, 'rgba(244,241,234,0)'); g.addColorStop(1, 'rgba(0,8,5,0.42)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+function overlay(T) {
+  ctx.save();
+  ctx.globalAlpha = .55; ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(grain[Math.floor(T * 4) % 4], 0, 0, W, H);
+  ctx.restore();
+}
+
+
+function puff(t, t0, x, y, w) {
+  const k = p(t, t0, t0 + .7); if (k <= 0 || k >= 1) return;
+  for (let i = 0; i < 9; i++) {
+    const dir = (i / 8 - .5) * 2, r = rng(i * 13 + Math.round(x))();
+    circ(x + dir * w * (.4 + eo(k) * .5), y - eo(k) * (20 + r * 40), (10 + r * 14) * (1 - k * .4));
+    ctx.fillStyle = rgba(O, .35 * (1 - k)); ctx.fill();
+  }
+}
+/* =====================================================================
+   SCENE 1 (0–3 s) — fuel nozzle, a "TAXE" tag on a "TAXE" tag
+   ===================================================================== */
+function tag(w, h, label, fill, ink) {
+  // price tag pointing left, origin at centre
+  sh(24, 12, .45);
+  ctx.beginPath();
+  ctx.moveTo(-w / 2, 0); ctx.lineTo(-w / 2 + h * .45, -h / 2); ctx.lineTo(w / 2 - 14, -h / 2); ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + 14);
+  ctx.lineTo(w / 2, h / 2 - 14); ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - 14, h / 2); ctx.lineTo(-w / 2 + h * .45, h / 2); ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill(); nosh();
+  circ(-w / 2 + h * .32, 0, h * .09); ctx.fillStyle = G; ctx.fill();
+  txt(label, h * .2, h * .03, h * .42, ink, 'IB');
+}
+function nozzle(t) {
+  // hose
+  ctx.beginPath(); ctx.moveTo(-460, -700); ctx.bezierCurveTo(-420, -380, -330, -260, -170, -150);
+  ctx.lineWidth = 64; ctx.lineCap = 'round'; ctx.strokeStyle = mix(O, G, .55); ctx.stroke();
+  ctx.lineWidth = 16; ctx.strokeStyle = mix(O, G, .45); ctx.stroke();
+  // body
+  sh(40, 22, .5);
+  ctx.save(); ctx.rotate(.5);
+  rr(-200, -110, 330, 190, 46); ctx.fillStyle = O; ctx.fill(); nosh();
+  rr(-160, 50, 200, 120, 40); ctx.lineWidth = 26; ctx.strokeStyle = mix(O, G, .2); ctx.stroke();    // guard
+  rr(-120, 40, 130, 34, 17); ctx.fillStyle = L; ctx.fill();                                           // trigger
+  rr(-170, -76, 220, 22, 11); ctx.fillStyle = mix(O, G, .15); ctx.fill();
+  // spout
+  ctx.fillStyle = mix(O, G, .3); ctx.fillRect(110, -60, 260, 46);
+  ctx.beginPath(); ctx.moveTo(360, -60); ctx.lineTo(430, -10); ctx.lineTo(420, 14); ctx.lineTo(350, -14); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  // drip
+  const d = (t * .9) % 1;
+  const tipX = 430 * Math.cos(.5) - 2 * Math.sin(.5) + 10, tipY = 430 * Math.sin(.5) + 2 * Math.cos(.5) + 12;
+  ctx.save(); glow(rgba(L, .6), 18);
+  ctx.beginPath(); const dy = tipY + ei(d) * 260, s = 1 - d * .3;
+  ctx.moveTo(tipX, dy - 26 * s); ctx.quadraticCurveTo(tipX + 16 * s, dy, tipX, dy + 12 * s); ctx.quadraticCurveTo(tipX - 16 * s, dy, tipX, dy - 26 * s);
+  ctx.globalAlpha = 1 - ei(d); ctx.fillStyle = L; ctx.fill(); ctx.restore();
+}
+function S1(t) {
+  bg();
+  const nin = eo(p(t, 0, .5));
+  group(470 - (1 - nin) * 300, 930, 1.25, -.08 + (1 - nin) * -.2, 1, () => nozzle(t));
+  // tag 1 slides in
+  const k1 = eo(p(t, .3, .75));
+  if (k1 > 0) {
+    group(700 + (1 - k1) * 700, 1260, 1.25, .12 + wobble(t, .75, .12, 14, 5), 1, () => {
+      line(-170, 0, -280, -120, 5, O); tag(380, 170, 'TAXE', O, G);
+    });
+  }
+  // tag 2 sticks on top (bounce)
+  const k2 = p(t, 1.15, 1.55);
+  if (k2 > 0) {
+    const s = eback(k2) * (1 + wobble(t, 1.55, .12, 22, 6));
+    group(800, 1372, s * .74, -.14 + wobble(t, 1.55, .2, 16, 5), 1, () => tag(380, 170, 'TAXE', L, G));
+  }
+  // tag 3, smaller still
+  const k3 = p(t, 1.9, 2.25);
+  if (k3 > 0) {
+    const s = eback(k3) * (1 + wobble(t, 2.25, .15, 26, 7));
+    group(850, 1452, s * .5, .1 + wobble(t, 2.25, .25, 18, 5), 1, () => tag(380, 170, 'TAXE', O, G));
+  }
+  caption(t, .9, 3.15, CAP.s1, 400, 120);
+}
+
+/* =====================================================================
+   SCENE 2 (3–9 s) — one litre, 0,61 € to the State
+   ===================================================================== */
+const SHARE = .6075 / 2.35;   // accise gazole / prix moyen gazole
+function bottle(fillK, opts = {}) {
+  // 1 L bottle, origin at bottom centre, 260 × 560
+  const w = 260, h = 560;
+  const shape = () => {
+    ctx.beginPath(); ctx.moveTo(-w / 2, -24); ctx.lineTo(-w / 2, -h + 190); ctx.quadraticCurveTo(-w / 2, -h + 120, -50, -h + 80); ctx.lineTo(-50, -h + 30);
+    ctx.lineTo(50, -h + 30); ctx.lineTo(50, -h + 80); ctx.quadraticCurveTo(w / 2, -h + 120, w / 2, -h + 190); ctx.lineTo(w / 2, -24); ctx.quadraticCurveTo(w / 2, 0, w / 2 - 24, 0);
+    ctx.lineTo(-w / 2 + 24, 0); ctx.quadraticCurveTo(-w / 2, 0, -w / 2, -24); ctx.closePath();
+  };
+  sh(30, 16, .35); shape(); ctx.fillStyle = rgba(O, .08); ctx.fill(); nosh();
+  ctx.save(); shape(); ctx.clip();
+  const lvl = -(h - 110);
+  ctx.fillStyle = rgba(O, .22); ctx.fillRect(-w / 2, lvl, w, -lvl);                      // fuel
+  for (let i = 0; i < 4; i++) { circ(-60 + i * 40, lvl + 40 + Math.sin(i * 2) * 20, 6 + i % 2 * 4); ctx.fillStyle = rgba(O, .25); ctx.fill(); }
+  if (fillK > 0) { const th = (h - 110) * SHARE * fillK; ctx.fillStyle = L; ctx.fillRect(-w / 2, -th, w, th); line(-w / 2, -th, w / 2, -th, 4, mix(L, O, .5), 'butt'); }
+  ctx.restore();
+  shape(); ctx.lineWidth = 8; ctx.strokeStyle = O; ctx.stroke();
+  rr(-62, -h, 124, 40, 10); ctx.fillStyle = O; ctx.fill();                                // cap
+  line(-w / 2 + 34, -h + 200, -w / 2 + 34, -60, 8, rgba(O, .35));                         // glint
+  if (!opts.noLabel) { rr(-70, -h + 230, 140, 70, 12); ctx.fillStyle = O; ctx.fill(); txt('1 L', 0, -h + 266, 44, G, 'IB'); }
+}
+function stateHouse(s = 1) {
+  ctx.save(); ctx.scale(s, s);
+  sh(20, 10, .4);
+  ctx.beginPath(); ctx.moveTo(-120, -150); ctx.lineTo(0, -230); ctx.lineTo(120, -150); ctx.closePath(); ctx.fillStyle = O; ctx.fill(); nosh();
+  for (let i = 0; i < 4; i++) { ctx.fillStyle = O; ctx.fillRect(-92 + i * 58, -140, 26, 110); }
+  ctx.fillRect(-130, -32, 260, 32);
+  ctx.fillStyle = L; ctx.fillRect(-8, -290, 6, 70); ctx.fillRect(-2, -290, 46, 28);        // flag
+  ctx.restore();
+}
+function eurPill(x, y, s, extra = '') {
+  group(x, y, s, 0, 1, () => {
+    sh(20, 10, .45); rr(-170, -46, 340, 92, 46); ctx.fillStyle = L; ctx.fill(); nosh();
+    txt('0,61 € → État' + extra, 0, 3, 42, G, 'IB');
+  });
+}
+function S2(t) {
+  bg();
+  const bin = eback(p(t, .1, .5));
+  const fill = eio(p(t, .5, 1.6));
+  group(340, 1400, bin, 0, 1, () => bottle(fill));
+  const lvlY = 1400 - (560 - 110) * SHARE;
+  eurPill(620, lvlY + 10, eback(p(t, 1.7, 2.05)));
+  line(470, lvlY + 10, 450, lvlY + 10, 0, L);
+  // government building pulls coins along a dotted line
+  const hk = eback(p(t, 2.2, 2.6));
+  group(800, 880, hk, 0, 1, () => stateHouse(.9));
+  const P = [[400, lvlY - 30], [420, 700], [650, 640], [790, 800]];
+  const pk = eio(p(t, 2.6, 3.1));
+  if (pk > 0) dashedPath(P, pk, rgba(O, .6));
+  for (let i = 0; i < 6; i++) {
+    const k = p(t, 3.0 + i * .28, 3.0 + i * .28 + .9);
+    if (k <= 0 || k >= 1) continue;
+    const [x, y] = bez(P, eio(k));
+    ctx.save(); sh(14, 6, .35); coin(x, y, 30 * (1 - k * .3), k * 6); ctx.restore();
+  }
+  caption(t, .15, 6.15, CAP.s2, 380, 112);
+}
+
+/* =====================================================================
+   SCENE 3 (9–16 s) — TVA 20 % stamp, then TVA on the tax
+   ===================================================================== */
+function stamp(label = 'TVA 20 %') {
+  // rubber stamp tool, origin = face centre
+  sh(24, 12, .45);
+  rr(-130, -40, 260, 46, 10); ctx.fillStyle = L; ctx.fill(); nosh();                     // pad
+  rr(-150, -96, 300, 60, 16); ctx.fillStyle = O; ctx.fill();                              // block
+  ctx.fillStyle = mix(O, G, .3); ctx.fillRect(-20, -200, 40, 110);                        // neck
+  ell(0, -232, 74, 50); ctx.fillStyle = O; ctx.fill();                                   // knob
+  txt(label, 0, -66, 30, G, 'IB');
+}
+function imprint(x, y, rot, k, sz = 1) {
+  if (k <= 0) return;
+  group(x, y, sz * (1 + (1 - eo(k)) * .15), rot, clamp(k * 3), () => {
+    rr(-150, -56, 300, 112, 14); ctx.lineWidth = 10; ctx.strokeStyle = L; ctx.stroke();
+    txt('TVA 20 %', 0, 4, 64, L, 'IB');
+  });
+}
+function swingStamp(t, t0, x, y, sz) {
+  // swings down from upper-right, hits at t0+.4, lifts away at t0+.75..1.1
+  const down = ei(p(t, t0, t0 + .4)), up = eio(p(t, t0 + .75, t0 + 1.15));
+  if (down <= 0 || up >= 1) return;
+  const a = (1 - down) * .9 + up * .7;
+  const px = x + (1 - down) * 260 + up * 300, py = y - (1 - down) * 520 - up * 600;
+  const squash = t > t0 + .4 ? 1 - wobble(t, t0 + .4, .12, 30, 9) : 1;
+  group(px, py, sz, a, 1, () => { ctx.scale(1 / squash, squash); stamp(); });
+}
+function S3(t) {
+  const shk = t > 3.0 ? 14 * Math.exp(-(t - 3.0) * 7) : 0;
+  ctx.save(); ctx.translate(Math.sin(t * 95) * shk, Math.cos(t * 81) * shk);
+  bg();
+  group(340, 1400, 1, 0, 1, () => bottle(1));
+  const lvlY = 1400 - (560 - 110) * SHARE;
+  eurPill(620, lvlY + 10, 1);
+  imprint(340, 1040, -.12, p(t, 1.0, 1.25));
+  imprint(650, lvlY - 72, .1, p(t, 3.0, 3.25), .75);
+  swingStamp(t, .6, 340, 1040, 1);
+  swingStamp(t, 2.6, 640, lvlY - 30, .7);
+  puff(t, 3.0, 620, lvlY + 60, 170);
+  caption(t, .15, 2.4, CAP.s3a, 380, 112);
+  caption(t, 2.55, 7.15, CAP.s3b, 380, 112);
+  ctx.restore();
+}
+
+/* =====================================================================
+   SCENE 4 (16–23 s) — 50 tiny litres fill a tank: 6 € of TVA on tax
+   ===================================================================== */
+const minis = Array.from({ length: 50 }, (_, i) => { const r = rng(1200 + i); return [r() * 1000 + 40, r() * 600 + 150 + (r() > .5 ? 1100 : 0), r() * 6 - 3]; });
+function miniBottle(lime) {
+  rr(-17, -46, 34, 46, 7); ctx.fillStyle = rgba(O, .15); ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = O; ctx.stroke();
+  ctx.fillStyle = L; ctx.fillRect(-15, -12 - 0 * lime, 30, 10);
+  rr(-8, -56, 16, 10, 3); ctx.fillStyle = O; ctx.fill();
+}
+function S4(t) {
+  bg();
+  // tank (jerrycan) outline
+  const tk = eback(p(t, .1, .5));
+  group(540, 1130, tk, 0, 1, () => {
+    sh(30, 16, .45); rr(-300, -230, 600, 440, 40); ctx.fillStyle = rgba(O, .06); ctx.fill(); nosh();
+    rr(-300, -230, 600, 440, 40); ctx.lineWidth = 10; ctx.strokeStyle = O; ctx.stroke();
+    rr(-120, -300, 240, 56, 22); ctx.lineWidth = 10; ctx.stroke();
+    rr(210, -290, 60, 70, 10); ctx.fillStyle = O; ctx.fill();
+    const glowK = p(t, 2.1, 2.6);
+    if (glowK > 0) { rr(-300, -230, 600, 440, 40); ctx.fillStyle = rgba(L, .12 * glowK); ctx.fill(); }
+  });
+  for (let i = 0; i < 50; i++) {
+    const col = i % 10, row = Math.floor(i / 10);
+    const tx = 540 - 243 + col * 54, ty = 1130 - 150 + row * 84 + 30;
+    const st = .35 + i * .028, k = eo(p(t, st, st + .55));
+    if (k <= 0) continue;
+    const [sx, sy, sr] = minis[i];
+    group(lerp(sx, tx, k), lerp(sy, ty, k) - Math.sin(k * PI) * 120, 1, sr * (1 - k), 1, () => miniBottle());
+  }
+  // counter: TVA on the accise for 50 L
+  const ck = eo(p(t, 2.5, 3.7));
+  if (t > 2.4) {
+    const v = 6.08 * ck, label = ck >= 1 ? '6 €' : v.toFixed(2).replace('.', ',') + ' €';
+    const land = t > 3.7 ? Math.exp(-(t - 3.7) * 5) : 0;
+    group(540, 680, eback(p(t, 2.4, 2.8)) * (1 + land * .12), 0, 1, () => { glow(rgba(L, .55), 36); txt(label, 0, 0, 210, L); });
+  }
+  caption(t, .15, 2.3, CAP.s4a, 400, 116);
+  caption(t, 2.45, 7.15, CAP.s4b, 380, 104);
+}
+
+/* =====================================================================
+   SCENE 5 (23–31 s) — receipt: 118 €, 42 % taxes
+   ===================================================================== */
+function S5(t) {
+  bg();
+  // printer slot
+  const pk = eo(p(t, .05, .35));
+  group(540, 560, 1, 0, pk, () => { sh(20, 10, .5); rr(-360, -36, 720, 56, 28); ctx.fillStyle = GD; ctx.fill(); nosh(); rr(-330, -6, 660, 12, 6); ctx.fillStyle = mix(G, '#000', .6); ctx.fill(); });
+  const len = 600 * eio(p(t, .3, 1.8));
+  if (len > 2) {
+    ctx.save(); ctx.beginPath(); ctx.rect(200, 560, 680, 700); ctx.clip();
+    ctx.translate(540, 560 + len - 600);
+    sh(26, 14, .4);
+    ctx.beginPath(); ctx.moveTo(-280, 0); ctx.lineTo(280, 0); ctx.lineTo(280, 580);
+    for (let i = 0; i <= 14; i++) ctx.lineTo(280 - i * 40, 580 + (i % 2 ? 18 : 0));
+    ctx.closePath(); ctx.fillStyle = O; ctx.fill(); nosh();
+    txt('STATION', 0, 60, 34, mix(O, G, .6), 'IB');
+    ctx.setLineDash([8, 10]); line(-230, 100, 230, 100, 3, mix(O, G, .4), 'butt'); ctx.setLineDash([]);
+    txt('GAZOLE', -230, 150, 34, G, 'IXB', 'left'); txt('2,35 €/L', 230, 150, 34, G, 'IXB', 'right');
+    txt('Volume', -230, 200, 34, mix(O, G, .6), 'IXB', 'left'); txt('50 L', 230, 200, 34, mix(O, G, .6), 'IXB', 'right');
+    ctx.setLineDash([8, 10]); line(-230, 250, 230, 250, 3, mix(O, G, .4), 'butt'); ctx.setLineDash([]);
+    txt('Plein 50 L', 0, 320, 52, G, 'IB');
+    const hl = eo(p(t, 1.9, 2.3));
+    rr(-170, 370, 340 * hl, 110, 14); ctx.fillStyle = L; ctx.fill();
+    txt('118 €', 0, 428, 100, G, 'IB');
+    txt('MERCI ET À BIENTÔT', 0, 530, 26, mix(O, G, .5), 'IXB');
+    ctx.restore();
+  }
+  // split bar
+  const bk = eio(p(t, 2.7, 3.4)), split = eio(p(t, 3.5, 4.3));
+  if (bk > 0) {
+    const x0 = 90, W2 = 900 * bk, y = 1320;
+    sh(20, 10, .4); rr(x0, y - 40, W2, 80, 40); ctx.fillStyle = O; ctx.fill(); nosh();
+    if (split > 0) {
+      const tw = 900 * .42 * split;
+      ctx.save(); rr(x0, y - 40, 900, 80, 40); ctx.clip(); ctx.fillStyle = L; ctx.fillRect(x0 + 900 - tw, y - 40, tw, 80); ctx.restore();
+      line(x0 + 900 * .58, y - 52, x0 + 900 * .58, y + 52, 8, G, 'butt');
+    }
+    const lk = eo(p(t, 4.3, 4.8));
+    ctx.globalAlpha = lk;
+    txt('58 %', x0 + 900 * .29, y + 2, 44, G, 'IB'); txt('42 %', x0 + 900 * .79, y + 2, 44, G, 'IB');
+    txt('carburant, raffinage,', x0 + 900 * .29, y + 84, 32, O, 'IXB'); txt('transport', x0 + 900 * .29, y + 122, 32, O, 'IXB');
+    txt('taxes ≈ 50 €', x0 + 900 * .79, y + 92, 42, L, 'IB');
+    ctx.globalAlpha = 1;
+  }
+  caption(t, .15, 3.4, CAP.s5a, 330, 104);
+  caption(t, 3.55, 8.15, CAP.s5b, 330, 112);
+}
+
+/* =====================================================================
+   SCENE 6 (31–38 s) — 52 weeks, a coin a week: ≈ 300 € / an
+   ===================================================================== */
+const WEEK_T = Array.from({ length: 52 }, (_, i) => { // flip times, accelerating then easing out
+  const x = (i + 1) / 52; return .5 + 4.3 * (x < .5 ? Math.sqrt(x / 2) : 1 - Math.sqrt((1 - x) / 2));
+});
+function S6(t) {
+  bg();
+  let wk = 0; for (const wt of WEEK_T) if (t >= wt) wk++;
+  // calendar
+  group(300, 1000, eback(p(t, .1, .5)), -.05, 1, () => {
+    sh(30, 16, .45); rr(-170, -150, 340, 330, 22); ctx.fillStyle = O; ctx.fill(); nosh();
+    rr(-170, -150, 340, 90, [22, 22, 0, 0]); ctx.fillStyle = L; ctx.fill();
+    txt('SEMAINE', 0, -104, 34, G, 'IB');
+    const last = wk ? WEEK_T[wk - 1] : -1, fk = p(t, last, last + .12);
+    txt(String(Math.max(1, wk)), 0, 60 - (1 - eo(fk)) * 20, 130, G, 'IB');
+    for (let i = 0; i < 4; i++) { rr(-120 + i * 80 - 8, -176, 16, 50, 8); ctx.fillStyle = mix(O, G, .6); ctx.fill(); }
+    if (fk < 1 && wk) { ctx.save(); ctx.translate(0, -60); ctx.scale(1, 1 - eo(fk)); rr(-170, 0, 340, 240, [0, 0, 22, 22]); ctx.fillStyle = mix(O, G, .15); ctx.fill(); ctx.restore(); }
+  });
+  // jar
+  const jx = 760, jb = 1360, jw = 300, jh = 400;
+  const fillN = wk;
+  group(0, 0, 1, 0, eo(p(t, .2, .6)), () => {
+    ctx.save(); rr(jx - jw / 2, jb - jh, jw, jh, 40); ctx.clip();
+    const lvl = (jh - 30) * fillN / 52;
+    for (let i = 0; i < fillN; i++) { const r = rng(4000 + i); const row = Math.floor(i / 5), cx = jx - 110 + (i % 5) * 55 + (row % 2) * 20, cy = jb - 22 - row * 34; ctx.fillStyle = mix(L, G, .3); ell(cx, cy + 6, 30, 12); ctx.fill(); ctx.fillStyle = L; ell(cx, cy, 30, 12); ctx.fill(); }
+    ctx.restore();
+    rr(jx - jw / 2, jb - jh, jw, jh, 40); ctx.lineWidth = 9; ctx.strokeStyle = O; ctx.stroke();
+    rr(jx - jw / 2 - 16, jb - jh - 40, jw + 32, 44, 12); ctx.fillStyle = O; ctx.fill();
+    line(jx - jw / 2 + 34, jb - jh + 60, jx - jw / 2 + 34, jb - 120, 8, rgba(O, .35));
+    rr(jx - 110, jb - jh - 120, 220, 18, 9); ctx.fillStyle = 'rgba(0,0,0,0)';
+  });
+  // falling coins (one per week)
+  WEEK_T.forEach((wt, i) => {
+    const k = p(t, wt - .3, wt);
+    if (k <= 0 || k >= 1) return;
+    const row = Math.floor(i / 5), tx = jx - 110 + (i % 5) * 55 + (row % 2) * 20, ty = jb - 22 - row * 34;
+    coin(lerp(440, tx, k), lerp(820, ty, ei(k)) - Math.sin(k * PI) * 120, 26, k * 8, Math.abs(Math.cos(k * 9)) * .8 + .2);
+  });
+  // counter
+  if (t > .4) {
+    const v = Math.round(300 * wk / 52), done = wk >= 52, land = done ? Math.exp(-(t - WEEK_T[51]) * 5) : 0;
+    group(540, 620, eback(p(t, .4, .8)) * (1 + land * .12), 0, 1, () => { glow(rgba(L, .5), 30); txt(`${done ? '≈ ' : ''}${v} € / an`, 0, 0, 140, L); });
+  }
+  caption(t, .15, 7.15, CAP.s6, 350, 104);
+}
+
+function phone(drawScreen, w = 500, h = 900) {
+  sh(50, 26, .55); rr(-w / 2, -h / 2, w, h, 70); ctx.fillStyle = O; ctx.fill(); nosh();
+  rr(-w / 2 + 18, -h / 2 + 18, w - 36, h - 36, 54); ctx.fillStyle = GL; ctx.fill();
+  ctx.save(); rr(-w / 2 + 18, -h / 2 + 18, w - 36, h - 36, 54); ctx.clip(); drawScreen(); ctx.restore();
+  rr(-60, -h / 2 + 36, 120, 30, 15); ctx.fillStyle = O; ctx.fill();
+  rr(-70, h / 2 - 44, 140, 8, 4); ctx.fillStyle = rgba(O, .5); ctx.fill();
+}
+function check(x, y, r, k, col) { // k: draw progress
+  ctx.beginPath(); const pts = [[-.45, .02], [-.12, .34], [.48, -.3]]; const segs = k * 2;
+  ctx.moveTo(x + pts[0][0] * r, y + pts[0][1] * r);
+  for (let i = 1; i < 3; i++) { const sk = clamp(segs - (i - 1)); if (sk <= 0) break; ctx.lineTo(x + lerp(pts[i - 1][0], pts[i][0], sk) * r, y + lerp(pts[i - 1][1], pts[i][1], sk) * r); }
+  ctx.lineWidth = r * .2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = col; ctx.stroke();
+}
+/* =====================================================================
+   SCENE 7 (38–48 s) — share + Cash en Bref logo + "Abonne-toi"
+   ===================================================================== */
+function plane(x, y, a, s) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.scale(s, s);
+  sh(18, 10, .4);
+  ctx.beginPath(); ctx.moveTo(70, 0); ctx.lineTo(-60, -46); ctx.lineTo(-30, 0); ctx.lineTo(-60, 46); ctx.closePath(); ctx.fillStyle = O; ctx.fill(); nosh();
+  ctx.beginPath(); ctx.moveTo(70, 0); ctx.lineTo(-30, 0); ctx.lineTo(-40, 26); ctx.closePath(); ctx.fillStyle = mix(O, G, .25); ctx.fill();
+  ctx.restore();
+}
+const LOGO = new Image(); LOGO.src = window.LOGO_SRC;
+function S7(t) {
+  bg();
+  // phone + share
+  const outP = eio(p(t, 2.6, 3.1));
+  if (outP < 1) {
+    const pin = eback(p(t, 0, .45));
+    group(540, 1180 + outP * 1100, .62 * pin, 0, 1, () => phone(() => {
+      txt('Partager', 0, -300, 46, rgba(O, .7), 'IB');
+      for (let i = 0; i < 6; i++) { const x = -130 + (i % 3) * 130, y = -120 + Math.floor(i / 3) * 170; circ(x, y, 50); ctx.fillStyle = rgba(O, .12); ctx.fill(); }
+      circ(0, 300, 70); ctx.fillStyle = L; ctx.fill();
+      ctx.save(); ctx.translate(0, 300); ctx.rotate(-.5); ctx.beginPath(); ctx.moveTo(34, 0); ctx.lineTo(-28, -22); ctx.lineTo(-14, 0); ctx.lineTo(-28, 22); ctx.closePath(); ctx.fillStyle = G; ctx.fill(); ctx.restore();
+    }));
+  }
+  const PP = [[540, 1000], [180, 860], [430, 420], [1220, 280]];
+  const pk = eio(p(t, .55, 2.45));
+  if (pk > 0 && pk < 1) {
+    dashedPath(PP, pk, rgba(O, .5), 6, [2, 20]);
+    const [x, y, a] = bez(PP, pk);
+    plane(x, y, a, .7 + Math.sin(pk * PI) * .6);
+  }
+  caption(t, .2, 2.85, CAP.s7, 400, 118);
+
+  // logo assembly
+  if (t > 2.9) {
+    // Cash en Bref badge
+    const ring = eio(p(t, 3.2, 3.75)), disc = eback(p(t, 3.0, 3.5)), R = 250;
+    const bob = Math.sin((t - 4) * 1.6) * 8 * clamp(t - 4);
+    ctx.save(); ctx.translate(540, 840 + bob);
+    ctx.beginPath(); ctx.arc(0, 0, R + 22, -PI / 2, -PI / 2 + TAU * ring); ctx.lineWidth = 8; ctx.strokeStyle = O; ctx.lineCap = 'round'; ctx.stroke();
+    group(0, 0, disc, (1 - eo(p(t, 3.0, 3.5))) * -.5, 1, () => {
+      glow(rgba(L, .35), 60); circ(0, 0, R); ctx.fillStyle = GD; ctx.fill(); nosh();
+      ctx.drawImage(LOGO, -R, -R, 2 * R, 2 * R);
+      const shine = p(t, 3.85, 4.5);
+      if (shine > 0 && shine < 1) { ctx.save(); circ(0, 0, R); ctx.clip(); ctx.translate(lerp(-2 * R, 2 * R, shine), 0); ctx.rotate(.5); ctx.fillStyle = rgba(O, .35); ctx.fillRect(-26, -2 * R, 52, 4 * R); ctx.restore(); }
+    });
+    ctx.restore();
+    // coin sparks bursting from the badge
+    const bs = p(t, 3.35, 4.2);
+    if (bs > 0 && bs < 1) for (let i = 0; i < 10; i++) { const a = i / 10 * TAU, d = R + 30 + eo(bs) * 120; star4(540 + Math.cos(a) * d, 840 + Math.sin(a) * d, 22 * Math.sin(bs * PI), bs * 3, i % 2 ? O : L); }
+    const tg = eo(p(t, 4.35, 4.85));
+    ctx.globalAlpha = tg; txt("L'argent expliqué simplement", 540, 1175 + (1 - tg) * 24, 46, rgba(O, .88), 'IXB'); ctx.globalAlpha = 1;
+
+    // subscribe button + cursor
+    const bk = eback(p(t, 5.1, 5.5));
+    const click = 6.75, press = t > click ? 1 - .1 * Math.sin(p(t, click, click + .22) * PI) : 1;
+    const ripple = p(t, click, click + .7);
+    if (ripple > 0 && ripple < 1) { ctx.save(); rr(-235 - ripple * 80 + 540, 1340 - 58 - ripple * 40, 470 + ripple * 160, 116 + ripple * 80, 80); ctx.lineWidth = 8 * (1 - ripple); ctx.strokeStyle = rgba(L, 1 - ripple); ctx.stroke(); ctx.restore(); }
+    const done = t > click + .15;
+    group(540, 1340, bk * press * (1 + .03 * Math.sin(t * 5) * clamp(t - 5.5) * (done ? 0 : 1)), 0, 1, () => {
+      sh(26, 14, .5); rr(-235, -58, 470, 116, 58); ctx.fillStyle = done ? O : L; ctx.fill(); nosh();
+      if (done) { check(-118, 0, 46, eo(p(t, click + .15, click + .45)), G); txt('Abonné', 30, 2, 52, G, 'IB'); }
+      else { circ(-162, 0, 26); ctx.fillStyle = G; ctx.fill(); ctx.beginPath(); ctx.moveTo(-170, -12); ctx.lineTo(-150, 0); ctx.lineTo(-170, 12); ctx.closePath(); ctx.fillStyle = L; ctx.fill(); txt('Abonne-toi', 30, 2, 52, G, 'IB'); }
+    });
+    if (done) for (let i = 0; i < 6; i++) { const k = p(t, click + .15, click + .9), a = -PI / 2 + (i - 2.5) * .45; if (k > 0 && k < 1) star4(540 + Math.cos(a) * (240 + k * 80), 1340 + Math.sin(a) * (90 + k * 90), 18 * Math.sin(k * PI), k * 4, i % 2 ? O : L); }
+    const ck = eio(p(t, 5.9, 6.65));
+    if (t > 5.8) {
+      const cx = lerp(880, 610, ck), cy = lerp(1560, 1362, ck), cs = t > click && t < click + .2 ? .85 : 1;
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(cs, cs); ctx.rotate(-.12); sh(14, 8, .5);
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 74); ctx.lineTo(18, 58); ctx.lineTo(32, 88); ctx.lineTo(46, 81); ctx.lineTo(32, 52); ctx.lineTo(56, 52); ctx.closePath();
+      ctx.fillStyle = O; ctx.fill(); nosh(); ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.strokeStyle = G; ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+/* =====================================================================
+   timeline + transitions
+   ===================================================================== */
+// [start, end, scene, designed length]. To sync to a voice-over, move CUTS into its pauses;
+// each scene's animation (designed at DESIGN seconds) is time-scaled to fit its slot.
+const CUTS = [0, 3, 9, 16, 23, 31, 38, 48];
+const DESIGN = [3, 6, 7, 7, 8, 7, 9];
+const SC = [S1, S2, S3, S4, S5, S6, S7].map((fn, i) => [CUTS[i], CUTS[i + 1], fn, DESIGN[i]]);
+const TR_IN = .2, TR_OUT = .22;
+function drawScene(i, T) { const [a, b, fn, d] = SC[i]; ctx.save(); fn(Math.max(0, T - a) * d / (b - a)); ctx.restore(); }
+function render(T) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; nosh();
+  let i = SC.findIndex(s => T >= s[0] && T < s[1]); if (i < 0) i = SC.length - 1;
+  // which boundary are we near?
+  let b = -1;
+  for (let j = 1; j < SC.length; j++) if (T >= SC[j][0] - TR_IN && T < SC[j][0] + TR_OUT) b = j;
+  if (b < 0) { drawScene(i, T); }
+  else {
+    const x = eio(p(T, SC[b][0] - TR_IN, SC[b][0] + TR_OUT));
+    const e = lerp(-420, W + 560, x), slant = 260, band = 150;
+    drawScene(b - 1, T);
+    ctx.save(); ctx.beginPath(); ctx.moveTo(-600, 0); ctx.lineTo(e - band + slant, 0); ctx.lineTo(e - band - slant, H); ctx.lineTo(-600, H); ctx.closePath(); ctx.clip();
+    drawScene(b, T); ctx.restore();
+    ctx.beginPath(); ctx.moveTo(e - band + slant, 0); ctx.lineTo(e + slant, 0); ctx.lineTo(e - slant, H); ctx.lineTo(e - band - slant, H); ctx.closePath(); ctx.fillStyle = L; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(e + slant + 14, 0); ctx.lineTo(e + slant + 30, 0); ctx.lineTo(e - slant + 30, H); ctx.lineTo(e - slant + 14, H); ctx.closePath(); ctx.fillStyle = O; ctx.fill();
+  }
+  // gentle fade-out on the very last frames
+  if (T > DURATION - .35) { ctx.fillStyle = `rgba(11,59,46,${p(T, DURATION - .35, DURATION) * .6})`; ctx.fillRect(0, 0, W, H); }
+  overlay(T);
+  if (window.SHOW_SAFE) { ctx.fillStyle = 'rgba(255,0,0,.25)'; ctx.fillRect(0, 0, W, H * .12); ctx.fillRect(0, H * .8, W, H * .2); }
+}
+
+window.frame = (T, type = 'image/jpeg', q = .93) => { render(T); return cv.toDataURL(type, q); };
+window.ready = (async () => {
+  await Promise.all(['IB', 'IXB', 'ISB'].map(f => document.fonts.load(`40px ${f}`)));
+  await LOGO.decode();
+  makeGrain(); render(0); return true;
+})();
+// live preview when opened in a browser: ?play
+if (location.search.includes('play')) window.ready.then(() => { const t0 = performance.now(); const loop = () => { render(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); });
+</script>
+</body>
+</html>
