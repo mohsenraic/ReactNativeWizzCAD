@@ -4,7 +4,7 @@ Pass --no-sfx for a music-only bed."""
 import os, sys, wave
 import numpy as np
 
-SR, DUR = 48000, 48.0
+SR, DUR = 48000, 44.5
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 mus = np.zeros((N, 2))
@@ -14,7 +14,7 @@ mus_sfx_cut = np.zeros((N, 2))  # SFX already in final (voice-over) time
 
 # Scene cuts as designed vs. as re-timed to the voice-over pauses (see CUTS in scene.html).
 DESIGN_CUTS = [0, 3, 9, 16, 23, 31, 38, 48]
-VO_CUTS = [0, 3, 9, 16, 23, 31, 38, 48]   # move into the voice-over's pauses once it exists
+VO_CUTS = [0, 4.8, 10.65, 17.3, 22.45, 30.7, 35.65, 44.5]   # in the voice-over's pauses
 
 
 def warp(t):
@@ -108,7 +108,7 @@ for b in range(nbars):
                 add(mus, t0 + k * beat / 2, pluck(hz(n), 0.5, 0.8), 0.16, pan=0.25)
 # ironic "wah-wah" descent to close
 for k, n in enumerate([67, 66, 65, 64]):
-    add(mus, 45.6 + k * 0.42, pluck(hz(n), 0.9 if k < 3 else 1.8, 0.6), 0.15)
+    add(mus, DUR - 2.4 + k * 0.42, pluck(hz(n), 0.9 if k < 3 else 1.8, 0.6), 0.15)
 # soft fades
 fade = np.ones(N)
 fade[: int(SR * 0.4)] = np.linspace(0, 1, int(SR * 0.4))

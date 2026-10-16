@@ -20,7 +20,7 @@
    Every frame is a pure function of time: window.frame(t) -> JPEG.
    Safe zone: y 230 (top 12 %) → y 1536 (bottom 20 %).
    ===================================================================== */
-const W = 1080, H = 1920, FPS = 30, DURATION = 48;
+const W = 1080, H = 1920, FPS = 30, DURATION = 44.5;
 const G = '#0B3B2E', L = '#C8F031', O = '#F4F1EA';
 const cv = document.getElementById('c');
 const ctx = cv.getContext('2d');
@@ -612,7 +612,7 @@ function S7(t) {
    ===================================================================== */
 // [start, end, scene, designed length]. To sync to a voice-over, move CUTS into its pauses;
 // each scene's animation (designed at DESIGN seconds) is time-scaled to fit its slot.
-const CUTS = [0, 3, 9, 16, 23, 31, 38, 48];
+const CUTS = [0, 4.8, 10.65, 17.3, 22.45, 30.7, 35.65, 44.5];
 const DESIGN = [3, 6, 7, 7, 8, 7, 9];
 const SC = [S1, S2, S3, S4, S5, S6, S7].map((fn, i) => [CUTS[i], CUTS[i + 1], fn, DESIGN[i]]);
 const TR_IN = .2, TR_OUT = .22;

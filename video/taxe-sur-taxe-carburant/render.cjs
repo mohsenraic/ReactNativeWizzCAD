@@ -7,7 +7,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const FPS = 30, DURATION = 48;
+const FPS = 30, DURATION = 44.5;
 const dir = __dirname, out = path.join(dir, 'out');
 fs.mkdirSync(out, { recursive: true });
 const args = process.argv.slice(2);

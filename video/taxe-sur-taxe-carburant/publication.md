@@ -1,6 +1,6 @@
 # Publication — Cash en Bref · Une taxe sur une taxe ? (Reel / TikTok / Short)
 
-Fichiers : `out/cash-en-bref-taxe-sur-taxe.mp4` (9:16, 48 s) · couverture `out/cover.jpg`
+Fichiers : `out/cash-en-bref-taxe-sur-taxe.mp4` (9:16, 44,5 s) · couverture `out/cover.jpg`
 
 ## Légende courte
 Une taxe… sur une taxe ? 🤨⛽
