@@ -804,9 +804,13 @@ function S7(t) {
 /* =====================================================================
    timeline + transitions
    ===================================================================== */
-const SC = [[0, 3, S1], [3, 8, S2], [8, 15, S3], [15, 22, S4], [22, 30, S5], [30, 39, S6], [39, 48, S7]];
+// [start, end, scene, designed length]. Cuts sit in the voice-over's pauses; each scene's
+// animation (designed at its original length) is time-scaled to fit its slot.
+const CUTS = [0, 4.05, 8.9, 15.75, 23.0, 31.4, 39.05, 48];
+const DESIGN = [3, 5, 7, 7, 8, 9, 9];
+const SC = [S1, S2, S3, S4, S5, S6, S7].map((fn, i) => [CUTS[i], CUTS[i + 1], fn, DESIGN[i]]);
 const TR_IN = .2, TR_OUT = .22;
-function drawScene(i, T) { ctx.save(); SC[i][2](Math.max(0, T - SC[i][0])); ctx.restore(); }
+function drawScene(i, T) { const [a, b, fn, d] = SC[i]; ctx.save(); fn(Math.max(0, T - a) * d / (b - a)); ctx.restore(); }
 function render(T) {
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; nosh();
   let i = SC.findIndex(s => T >= s[0] && T < s[1]); if (i < 0) i = SC.length - 1;

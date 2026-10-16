@@ -9,9 +9,24 @@ N = int(SR * DUR)
 rng = np.random.default_rng(7)
 mus = np.zeros((N, 2))
 sfx = np.zeros((N, 2))
+mus_sfx_cut = np.zeros((N, 2))  # SFX already in final (voice-over) time
+
+
+# Scene cuts as designed vs. as re-timed to the voice-over pauses (see CUTS in scene.html).
+DESIGN_CUTS = [0, 3, 8, 15, 22, 30, 39, 48]
+VO_CUTS = [0, 4.05, 8.9, 15.75, 23.0, 31.4, 39.05, 48]
+
+
+def warp(t):
+    for k in range(len(DESIGN_CUTS) - 1):
+        a, b = DESIGN_CUTS[k], DESIGN_CUTS[k + 1]
+        if t < b or k == len(DESIGN_CUTS) - 2:
+            return VO_CUTS[k] + (t - a) * (VO_CUTS[k + 1] - VO_CUTS[k]) / (b - a)
 
 
 def add(buf, t0, sig, gain=1.0, pan=0.0):
+    if buf is sfx:
+        t0 = warp(t0)
     i = int(t0 * SR)
     if i >= N:
         return
@@ -165,8 +180,8 @@ def eo(x):
 
 
 # transitions (wipe centred on each cut)
-for tc in [3, 8, 15, 22, 30, 39]:
-    add(sfx, tc - 0.3, whoosh(0.5), 0.22, pan=-0.2)
+for tc in VO_CUTS[1:-1]:
+    add(mus_sfx_cut, tc - 0.3, whoosh(0.5), 0.22, pan=-0.2)
 # S1 vault
 add(sfx, 0.25, creak(0.7), 0.25)
 add(sfx, 0.85, rumble(1.1), 0.4)
@@ -247,7 +262,7 @@ add(sfx, 39 + 6.8, chime((1760, 2349)), 0.13)
 
 # ---------------------------------------------------------------- mix
 mus *= 0.32 / (np.abs(mus).max() + 1e-9)     # music kept low for the voice-over
-mix = mus if "--no-sfx" in sys.argv else mus + sfx * 0.9
+mix = mus if "--no-sfx" in sys.argv else mus + (sfx + mus_sfx_cut) * 0.9
 peak = np.abs(mix).max()
 if peak > 0.89:
     mix *= 0.89 / peak
