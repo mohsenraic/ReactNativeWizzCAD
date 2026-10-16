@@ -73,6 +73,8 @@ export interface PhotoCredit {
   subject: string;
   /** File page (e.g. Wikimedia Commons). */
   sourceUrl: string;
+  /** Short permanent link to the file page (e.g. Commons ?curid=), for length-limited credits. */
+  shortUrl?: string;
   author: string;
   license: PhotoLicense;
   licenseUrl: string;
